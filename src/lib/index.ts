@@ -2,15 +2,29 @@ import { Render } from './render';
 import { Handler } from './element';
 import { getCosDeg, getSinDeg } from './utils';
 
-class CanvasCut {
+export class CanvasCut {
+	private canvas: HTMLCanvasElement;
 	private context: CanvasRenderingContext2D;
 	private render: Render = Render.getInstance();
 	private elements: Handler[] = [];
 	private currenOprateMode: 'move' | 'rotate' | 'cut' | 'none' = 'cut';
 	private currentSelectedElement: Handler | null = null;
 
-	constructor(context: CanvasRenderingContext2D) {
-		this.context = context
+	constructor(canvas: HTMLCanvasElement) {
+		this.canvas = canvas;
+		const context = canvas.getContext('2d')
+		if (!context) {
+			throw Error(`can't get context from html dom canvas => ${canvas}`);
+		} else {
+			this.context = context;
+		}
+	}
+
+	public init = () => {
+		const { context, canvas } = this;
+		this.render.unshift(() => {
+			context.clearRect(0, 0, canvas.width, canvas.height)
+		});
 	}
 
 	public createElement = () => {
@@ -86,4 +100,4 @@ class CanvasCut {
 	}
 }
 
-export const attachContext = (context: CanvasRenderingContext2D) => new CanvasCut(context);	
+export const attachContext = (canvas: HTMLCanvasElement, ) => new CanvasCut(canvas);	
