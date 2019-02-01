@@ -1,11 +1,5 @@
 import { affineTransformation, linearMove } from 'lib/utils';
 
-export interface BaseElement {
-	move(vector: Pos): void;
-	rotate(cosDeg: number, sinDeg: number, ): void;
-	record(): void;
-}
-
 export class BaseElement {
 	public key = Symbol();
 
