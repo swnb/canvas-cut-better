@@ -3,7 +3,6 @@ import { Handler } from './element';
 import { getCosDeg, getSinDeg } from './utils';
 
 export class CanvasCut {
-	private canvas: HTMLCanvasElement;
 	private context: CanvasRenderingContext2D;
 	private render: Render = Render.getInstance();
 	private elements: Handler[] = [];
@@ -11,17 +10,12 @@ export class CanvasCut {
 	private currentSelectedElement: Handler | null = null;
 
 	constructor(canvas: HTMLCanvasElement) {
-		this.canvas = canvas;
 		const context = canvas.getContext('2d')
 		if (!context) {
 			throw Error(`can't get context from html dom canvas => ${canvas}`);
 		} else {
 			this.context = context;
 		}
-	}
-
-	public init = () => {
-		const { context, canvas } = this;
 		this.render.unshift(() => {
 			context.clearRect(0, 0, canvas.width, canvas.height)
 		});
@@ -84,8 +78,10 @@ export class CanvasCut {
 
 	private moveElement = ([preX, preY]: Pos, [cX, cY]: Pos) => {
 		if (!this.currentSelectedElement) return
+
 		this.currentSelectedElement.changeState();
-		this.currentSelectedElement.move([cX - preX, cY - preY]);
+		const moveVector: Vector = [cX - preX, cY - preY]
+		this.currentSelectedElement.move(moveVector);
 	}
 
 	private rotateElement = ([preX, preY]: Pos, [cX, cY]: Pos) => {

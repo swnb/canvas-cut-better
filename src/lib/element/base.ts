@@ -3,7 +3,7 @@ import { affineTransformation, linearMove } from 'lib/utils';
 export class BaseElement {
 	public key = Symbol();
 
-	public centerPoint: Pos;
+	private centerPoint: Pos;
 	// private originPaths: Paths;
 	private recordPathsQueue: Paths[] = [];
 	private currentPaths: Paths;
@@ -12,7 +12,6 @@ export class BaseElement {
 		this.centerPoint = [...centerPoint] as Pos;
 		// this.originPaths = [...paths];
 		this.currentPaths = [...paths];
-		// this.color = color;
 	}
 
 	public getCenterPionter = () => [...this.centerPoint] as Pos;
