@@ -46,7 +46,7 @@ export class CanvasCut extends React.PureComponent {
 		const [preX, preY] = this.prePointer;
 		const nextPointer = getPointer(event);
 		this.prePointer = nextPointer;
-		const vector = [nextPointer[0] - preX, nextPointer[1] - preY];
+		const vector: Pos = [nextPointer[0] - preX, nextPointer[1] - preY];
 	};
 
 	private onPointerUp = () => {

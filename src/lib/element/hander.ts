@@ -2,8 +2,12 @@ import { BaseElement } from './base';
 import { Color } from './color';
 import { RenderElement } from 'lib/render';
 
+type DrawMode = 'fill' | 'stroke';
+
 export class Handler extends BaseElement implements RenderElement {
+	private drawMode: DrawMode = 'fill';
 	private color: Color = new Color(107, 185, 240);
+	private preDrawStyle: string | CanvasGradient | CanvasPattern = "";
 	private ctx: CanvasRenderingContext2D;
 	private path2d = new Path2D();
 
@@ -11,16 +15,42 @@ export class Handler extends BaseElement implements RenderElement {
 		this.ctx = context;
 	}
 
-	public isInside = (point: Pos) => this.ctx.isPointInPath(this.path2d, ...point)
+	public setColor = (color: Color) => {
+		this.color = color
+	}
+
+	public setDrawMode = (mode: DrawMode) => {
+		this.drawMode = mode
+	}
+
+	public isPointerInside = (point: Pos) => this.ctx.isPointInPath(this.path2d, ...point)
+
+	// todo: 这里需要写入代码
+	public isPointerInsideRotateHandler = (pointer: Pos) => false;
 
 	public render = () => {
-		const { ctx } = this;
+		const { ctx, color, path2d, drawMode } = this;
 		if (!ctx) return;
 
-		const prefillStyle = ctx.fillStyle;
-		ctx.fillStyle = this.color.getColor();
-		this.draw(this.path2d);
-		ctx.fill(this.path2d);
-		ctx.fillStyle = prefillStyle;
+		this.save();
+		ctx.fillStyle = color.getColor();
+		this.draw(path2d);
+		switch (drawMode) {
+			case "fill":
+				ctx.fill(path2d);
+				break
+			case 'stroke':
+				ctx.stroke(path2d);
+				break
+		}
+		this.reStore();
+	}
+
+	private save = () => {
+		this.preDrawStyle = this.ctx.fillStyle;
+	}
+
+	private reStore = () => {
+		this.ctx.fillStyle = this.preDrawStyle;
 	}
 }

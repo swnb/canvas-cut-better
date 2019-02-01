@@ -18,8 +18,6 @@ export class Render {
 			this.running = true;
 			this.start();
 		}
-
-		return () => this.remove(element);
 	}
 
 

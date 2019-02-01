@@ -1,26 +1,27 @@
-import { Color } from "./color";
-import { affineTransformation, getCosDeg, getSinDeg, linearMove } from 'lib/utils';
+import { affineTransformation, linearMove } from 'lib/utils';
 
 export interface BaseElement {
 	move(vector: Pos): void;
-	rotate(vector: Pos): void;
+	rotate(cosDeg: number, sinDeg: number, ): void;
 	record(): void;
 }
 
 export class BaseElement {
 	public key = Symbol();
 
-	private centerPoint: Pos;
+	public centerPoint: Pos;
 	// private originPaths: Paths;
 	private recordPathsQueue: Paths[] = [];
 	private currentPaths: Paths;
 
-	constructor(centerPoint: Pos, paths: Pos[], color: Color) {
-		this.centerPoint = centerPoint;
+	constructor(centerPoint: Pos, paths: Pos[]) {
+		this.centerPoint = [...centerPoint] as Pos;
 		// this.originPaths = [...paths];
 		this.currentPaths = [...paths];
 		// this.color = color;
 	}
+
+	public getCenterPionter = () => [...this.centerPoint] as Pos;
 
 	public draw = (path2d: Path2D) => {
 		const { currentPaths } = this;
@@ -36,11 +37,7 @@ export class BaseElement {
 		this.centerPoint = linearMove(this.centerPoint, vector)
 	}
 
-	public rotate = (vector: Pos) => {
-		const baseVector = [1, 1] as Pos;
-		const movingVector = [2, 2] as Pos;
-		const cosDeg = getCosDeg(baseVector, movingVector);
-		const sinDeg = getSinDeg(baseVector, movingVector)
+	public rotate = (cosDeg: number, sinDeg: number, ) => {
 		this.currentPaths = this.currentPaths.map(pos => affineTransformation(cosDeg, sinDeg, pos));
 	}
 
