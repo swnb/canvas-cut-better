@@ -5,6 +5,8 @@ import { RenderElement } from 'lib/render';
 type DrawMode = 'fill' | 'stroke';
 
 export class Handler extends BaseElement implements RenderElement {
+	private isChange = true;
+
 	private drawMode: DrawMode = 'fill';
 	private color: Color = new Color(107, 185, 240);
 	private preDrawStyle: string | CanvasGradient | CanvasPattern = "";
@@ -28,13 +30,25 @@ export class Handler extends BaseElement implements RenderElement {
 	// todo: 这里需要写入代码
 	public isPointerInsideRotateHandler = (pointer: Pos) => false;
 
+	public changeState = () => {
+		if (!this.isChange) this.isChange = true;
+	}
+
 	public render = () => {
-		const { ctx, color, path2d, drawMode } = this;
+		const { ctx, color, drawMode } = this;
 		if (!ctx) return;
+
+		// path2d will reclare when element is change
+		let path2d = this.path2d
+		if (this.isChange) {
+			path2d = new Path2D();
+			this.draw(path2d);
+			this.path2d = path2d;
+			this.isChange = false;
+		}
 
 		this.save();
 		ctx.fillStyle = color.getColor();
-		this.draw(path2d);
 		switch (drawMode) {
 			case "fill":
 				ctx.fill(path2d);

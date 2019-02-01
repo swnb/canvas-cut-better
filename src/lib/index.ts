@@ -84,13 +84,14 @@ export class CanvasCut {
 
 	private moveElement = ([preX, preY]: Pos, [cX, cY]: Pos) => {
 		if (!this.currentSelectedElement) return
-
+		this.currentSelectedElement.changeState();
 		this.currentSelectedElement.move([cX - preX, cY - preY]);
 	}
 
 	private rotateElement = ([preX, preY]: Pos, [cX, cY]: Pos) => {
 		if (!this.currentSelectedElement) return;
 
+		this.currentSelectedElement.changeState();
 		const [centerX, centerY] = this.currentSelectedElement.getCenterPionter();
 		const baseVector: Vector = [preX - centerX, preY - centerY];
 		const moveVector: Vector = [cX - centerX, cY - centerY];

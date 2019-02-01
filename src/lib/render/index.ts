@@ -11,6 +11,9 @@ export class Render {
 	private renderTimeID: number | null = null;
 	private renderElements: Map<symbol, RenderElement> = new Map();
 
+	private beforeRenderCb: Array<() => void> = [];
+	private afterRenderCb: Array<() => void> = [];
+
 	public registRender = (element: RenderElement) => {
 		this.renderElements.set(element.key, element);
 		// check if this engine is stop or not;
@@ -19,7 +22,6 @@ export class Render {
 			this.start();
 		}
 	}
-
 
 	public start = () => {
 		// everytime start will check the renderElements length; and will stop when there is no render elements;
@@ -51,7 +53,29 @@ export class Render {
 		this.renderElements.clear();
 	}
 
+	public unshift = (cb: () => void) => {
+		this.beforeRenderCb.push(cb);
+	}
+
+	public push = (cb: () => void) => {
+		this.afterRenderCb.push(cb);
+	}
+
+	private breforeRender() {
+		if (this.beforeRenderCb.length === 0) return;
+
+		this.beforeRenderCb.forEach(fn => void fn());
+	}
+
+	private afterRener() {
+		if (this.afterRenderCb.length === 0) return;
+
+		this.afterRenderCb.forEach(fn => void fn());
+	}
+
 	private render = () => {
+		this.breforeRender();
 		this.renderElements.forEach(ele => ele.render());
+		this.afterRener();
 	}
 }
