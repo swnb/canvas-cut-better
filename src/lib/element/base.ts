@@ -1,35 +1,29 @@
 import { Color } from "./color";
-import { RenderElement } from '../render'
 import { affineTransformation, getCosDeg, getSinDeg, linearMove } from 'lib/utils';
 
 export interface BaseElement {
 	move(vector: Pos): void;
 	rotate(vector: Pos): void;
 	record(): void;
-	isInside(point: Pos): boolean;
 }
 
-export class BaseElement implements RenderElement {
+export class BaseElement {
 	public key = Symbol();
 
-	private color: Color = new Color(107, 185, 240);
-
-	private path2d = new Path2D();
-
 	private centerPoint: Pos;
-	private originPaths: Paths;
+	// private originPaths: Paths;
 	private recordPathsQueue: Paths[] = [];
 	private currentPaths: Paths;
 
 	constructor(centerPoint: Pos, paths: Pos[], color: Color) {
 		this.centerPoint = centerPoint;
-		this.originPaths = [...paths];
+		// this.originPaths = [...paths];
 		this.currentPaths = [...paths];
-		this.color = color;
+		// this.color = color;
 	}
 
-	public render = () => {
-		const { path2d, currentPaths } = this;
+	public draw = (path2d: Path2D) => {
+		const { currentPaths } = this;
 		path2d.moveTo(...currentPaths[0]);
 		for (let i = 1; i < currentPaths.length; i++) {
 			path2d.lineTo(...currentPaths[i]);
@@ -39,6 +33,7 @@ export class BaseElement implements RenderElement {
 
 	public move = (vector: Pos) => {
 		this.currentPaths = this.currentPaths.map(pos => linearMove(pos, vector));
+		this.centerPoint = linearMove(this.centerPoint, vector)
 	}
 
 	public rotate = (vector: Pos) => {
@@ -55,9 +50,5 @@ export class BaseElement implements RenderElement {
 
 	public cut = (vector: Pos) => {
 		return void (0);
-	}
-
-	public isInside = (point: Pos) => {
-		return false;
 	}
 }
