@@ -1,28 +1,23 @@
 import { Render } from './render';
-import { Handler } from './element';
+import { Handler, Rotater } from './element';
 import { getCosDeg, getSinDeg } from './utils';
 
 export class CanvasCut {
 	private context: CanvasRenderingContext2D;
-	private render: Render = Render.getInstance();
+	private render: Render
 	private elements: Handler[] = [];
+	private rotater: Rotater;
 	private currenOprateMode: 'move' | 'rotate' | 'cut' | 'none' = 'cut';
 	private currentSelectedElement: Handler | null = null;
 
-	constructor(canvas: HTMLCanvasElement) {
-		const context = canvas.getContext('2d')
-		if (!context) {
-			throw Error(`can't get context from html dom canvas => ${canvas}`);
-		} else {
-			this.context = context;
-		}
-		this.render.unshift(() => {
-			context.clearRect(0, 0, canvas.width, canvas.height)
-		});
+	constructor(context: CanvasRenderingContext2D, render: Render, rotater: Rotater) {
+		this.context = context;
+		this.render = render;
+		this.rotater = rotater;
 	}
 
 	public createElement = () => {
-		const ele = new Handler([50, 50], [[25, 25], [75, 25], [25, 75]]);
+		const ele = new Handler([[25, 25], [75, 25], [25, 75]]);
 		ele.attachContext(this.context);
 		this.elements.push(ele);
 		this.render.registRender(ele);
@@ -33,19 +28,24 @@ export class CanvasCut {
 	}
 
 	public selectElement = (pointer: Pos) => {
-		this.currenOprateMode = 'cut';
-		this.currentSelectedElement = null;
+		if (this.rotater.isPointerInside(pointer)) {
+			this.currenOprateMode = 'rotate';
+			return
+		}
 
 		for (const element of this.elements) {
 			if (element.isPointerInside(pointer)) {
 				this.currenOprateMode = 'move';
 				this.currentSelectedElement = element;
-				return;
-			} else if (element.isPointerInsideRotateHandler(pointer)) {
-				this.currenOprateMode = 'rotate';
+				this.rotater.bindElement(element);
 				return;
 			}
 		}
+
+		// when no element is selected, clear state and set cut mode;
+		this.currenOprateMode = 'cut';
+		this.currentSelectedElement = null;
+		this.rotater.destory();
 	}
 
 	public receivePointerDown = (pointer: Pos) => {
@@ -56,6 +56,7 @@ export class CanvasCut {
 		switch (this.currenOprateMode) {
 			case 'move':
 				this.moveElement(prePointer, curPointer);
+				this.rotater.changeState();
 				break;
 			case 'rotate':
 				this.rotateElement(prePointer, curPointer);
@@ -97,4 +98,18 @@ export class CanvasCut {
 	}
 }
 
-export const attachContext = (canvas: HTMLCanvasElement, ) => new CanvasCut(canvas);	
+export const attachContext = (canvas: HTMLCanvasElement) => {
+	const context = canvas.getContext('2d')
+	if (!context) throw Error(`can't get context from html dom canvas => ${canvas}`);
+	// render
+	const render = Render.getInstance();
+	// clear every render
+	render.unshift(() => {
+		context.clearRect(0, 0, canvas.width, canvas.height)
+	});
+	// rotater
+	const rotater = new Rotater(context);
+	render.push(rotater.render);
+
+	return new CanvasCut(context, render, rotater);
+}

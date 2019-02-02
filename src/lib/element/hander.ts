@@ -27,9 +27,6 @@ export class Handler extends BaseElement implements RenderElement {
 
 	public isPointerInside = (point: Pos) => this.ctx.isPointInPath(this.path2d, ...point)
 
-	// todo: 这里需要写入代码
-	public isPointerInsideRotateHandler = (pointer: Pos) => false;
-
 	public changeState = () => {
 		if (!this.isChange) this.isChange = true;
 	}
@@ -61,10 +58,24 @@ export class Handler extends BaseElement implements RenderElement {
 	}
 
 	private save = () => {
-		this.preDrawStyle = this.ctx.fillStyle;
+		switch (this.drawMode) {
+			case "fill":
+				this.preDrawStyle = this.ctx.fillStyle;
+				break
+			case 'stroke':
+				this.preDrawStyle = this.ctx.strokeStyle;
+				break
+		}
 	}
 
 	private reStore = () => {
-		this.ctx.fillStyle = this.preDrawStyle;
+		switch (this.drawMode) {
+			case "fill":
+				this.ctx.fillStyle = this.preDrawStyle;
+				break
+			case 'stroke':
+				this.ctx.strokeStyle = this.preDrawStyle;
+				break
+		}
 	}
 }

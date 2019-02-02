@@ -1,4 +1,4 @@
-import { affineTransformation, linearMove } from 'lib/utils';
+import { affineTransformation, linearMove, countCenterPointer } from 'lib/utils';
 
 export class BaseElement {
 	public key = Symbol();
@@ -8,8 +8,8 @@ export class BaseElement {
 	private recordPathsQueue: Paths[] = [];
 	private currentPaths: Paths;
 
-	constructor(centerPoint: Pos, paths: Pos[]) {
-		this.centerPoint = [...centerPoint] as Pos;
+	constructor(paths: Pos[]) {
+		this.centerPoint = countCenterPointer(paths)
 		// this.originPaths = [...paths];
 		this.currentPaths = [...paths];
 	}
@@ -30,8 +30,8 @@ export class BaseElement {
 		this.centerPoint = linearMove(this.centerPoint, vector)
 	}
 
-	public rotate = (cosDeg: number, sinDeg: number, ) => {
-		this.currentPaths = this.currentPaths.map(pos => affineTransformation(cosDeg, sinDeg, pos));
+	public rotate = (cosDeg: number, sinDeg: number) => {
+		this.currentPaths = this.currentPaths.map(pos => affineTransformation(cosDeg, sinDeg, pos, this.centerPoint));
 	}
 
 	public record = () => {

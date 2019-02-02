@@ -19,10 +19,9 @@ export class CanvasCutComponent extends React.PureComponent {
 		this.setSize();
 		const canvas = (this.ref.current as HTMLCanvasElement) as HTMLCanvasElement;
 		this.cc = attachContext(canvas);
-		for (let i = 0; i < 100; i++) {
+		for (let i = 0; i < 10; i++) {
 			this.cc.createElement();
 		}
-		this.cc.init();
 		window.addEventListener('resize', this.setSize);
 	};
 
