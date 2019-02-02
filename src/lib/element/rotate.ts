@@ -14,9 +14,9 @@ export class Rotater implements RenderElement {
 	private context: CanvasRenderingContext2D;
 	private color: Color;
 	private path2d: Path2D | null = null;
-	private pointer: Pos | null = null
+	private point: Pos | null = null
 	private currentElement: Handler | null = null;
-	private prePointer: Pos | null = null;
+	private prePoint: Pos | null = null;
 	private isChange = false;
 
 	constructor(context: CanvasRenderingContext2D, options: Options = {}) {
@@ -25,20 +25,20 @@ export class Rotater implements RenderElement {
 	}
 
 	public render = () => {
-		if (!this.currentElement || !this.pointer) return;
+		if (!this.currentElement || !this.point) return;
 
 		const elementRelPos = this.relPos(this.currentElement.getCenterPionter());
 
-		if (this.prePointer && !isSamePos(elementRelPos, this.prePointer)) {
+		if (this.prePoint && !isSamePos(elementRelPos, this.prePoint)) {
 			// element moved
-			const abV = abVector(this.prePointer, elementRelPos);
-			this.setNewPaths(abPlus(this.pointer, abV));
-			this.prePointer = elementRelPos;
+			const abV = abVector(this.prePoint, elementRelPos);
+			this.setNewPaths(abPlus(this.point, abV));
+			this.prePoint = elementRelPos;
 		}
 
 		if (this.isChange) {
 			this.path2d = new Path2D()
-			const [x, y] = this.pointer;
+			const [x, y] = this.point;
 			this.path2d.arc(x, y, 10, 0, 2 * Math.PI)
 			this.isChange = false;
 		}
@@ -57,22 +57,22 @@ export class Rotater implements RenderElement {
 		if (this.currentElement && this.currentElement === element) return;
 
 		this.currentElement = element;
-		this.prePointer = this.relPos(element.getCenterPionter());
-		this.setNewPaths(this.prePointer);
+		this.prePoint = this.relPos(element.getCenterPionter());
+		this.setNewPaths(this.prePoint);
 	}
 
-	public isPointerInside = (pointer: Pos) => {
+	public isPointInside = (point: Pos) => {
 		if (this.path2d) {
-			return this.context.isPointInPath(this.path2d, ...pointer);
+			return this.context.isPointInPath(this.path2d, ...point);
 		}
 		return false;
 	}
 
 	public rotate = (cosDeg: number, sinDeg: number) => {
-		if (!this.currentElement || !this.pointer) return;
+		if (!this.currentElement || !this.point) return;
 
-		const centerPointer = this.currentElement.getCenterPionter();
-		this.setNewPaths(affineTransformation(cosDeg, sinDeg, this.pointer, centerPointer));
+		const centerPoint = this.currentElement.getCenterPionter();
+		this.setNewPaths(affineTransformation(cosDeg, sinDeg, this.point, centerPoint));
 	}
 
 	public changeState = () => {
@@ -82,7 +82,7 @@ export class Rotater implements RenderElement {
 	private relPos = ([x, y]: Pos): Pos => [x, y - 30];
 
 	private setNewPaths = (pos: Pos) => {
-		this.pointer = pos;
+		this.point = pos;
 
 		this.changeState();
 	}

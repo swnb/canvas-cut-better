@@ -25,7 +25,7 @@ export class Handler extends BaseElement implements RenderElement {
 		this.drawMode = mode
 	}
 
-	public isPointerInside = (point: Pos) => this.ctx.isPointInPath(this.path2d, ...point)
+	public isPointInside = (point: Pos) => this.ctx.isPointInPath(this.path2d, ...point)
 
 	public changeState = () => {
 		if (!this.isChange) this.isChange = true;

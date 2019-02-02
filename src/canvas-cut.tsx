@@ -3,7 +3,7 @@ import { attachContext, CanvasCut } from 'lib';
 
 type ReactEvent = React.PointerEvent<HTMLCanvasElement>;
 
-const getPointer = ({ clientX, clientY }: ReactEvent): Pos => [
+const getPointerPos = ({ clientX, clientY }: ReactEvent): Pos => [
 	clientX,
 	clientY
 ];
@@ -12,7 +12,7 @@ export class CanvasCutComponent extends React.PureComponent {
 	public ref = React.createRef<HTMLCanvasElement>();
 
 	private startOprate = false;
-	private prePointer: Pos = [0, 0];
+	private prePos: Pos = [0, 0];
 	private cc: CanvasCut | null = null;
 
 	public componentDidMount = () => {
@@ -46,15 +46,15 @@ export class CanvasCutComponent extends React.PureComponent {
 	private onPointerDown = (event: ReactEvent) => {
 		if (!this.cc) return;
 		this.startOprate = true;
-		this.prePointer = getPointer(event);
-		this.cc.receivePointerDown(this.prePointer);
+		this.prePos = getPointerPos(event);
+		this.cc.receivePointerDown(this.prePos);
 	};
 
 	private onPointerMove = (event: ReactEvent) => {
 		if (!this.startOprate || !this.cc) return;
-		const nextPointer = getPointer(event);
-		this.cc.receivePointerMove(this.prePointer, nextPointer);
-		this.prePointer = nextPointer;
+		const nextPos = getPointerPos(event);
+		this.cc.receivePointerMove(this.prePos, nextPos);
+		this.prePos = nextPos;
 	};
 
 	private onPointerUp = () => {

@@ -27,14 +27,14 @@ export class CanvasCut {
 		this.render.clear();
 	}
 
-	public selectElement = (pointer: Pos) => {
-		if (this.rotater.isPointerInside(pointer)) {
+	public selectElement = (pos: Pos) => {
+		if (this.rotater.isPointInside(pos)) {
 			this.currenOprateMode = 'rotate';
 			return
 		}
 
 		for (const element of this.elements) {
-			if (element.isPointerInside(pointer)) {
+			if (element.isPointInside(pos)) {
 				this.currenOprateMode = 'move';
 				this.currentSelectedElement = element;
 				this.rotater.bindElement(element);
@@ -48,17 +48,17 @@ export class CanvasCut {
 		this.rotater.destory();
 	}
 
-	public receivePointerDown = (pointer: Pos) => {
-		this.selectElement(pointer);
+	public receivePointerDown = (point: Pos) => {
+		this.selectElement(point);
 	}
 
-	public receivePointerMove = (prePointer: Pos, curPointer: Pos) => {
+	public receivePointerMove = (prePoint: Pos, curPoint: Pos) => {
 		switch (this.currenOprateMode) {
 			case 'move':
-				this.moveElement(prePointer, curPointer);
+				this.moveElement(prePoint, curPoint);
 				break;
 			case 'rotate':
-				this.rotateElement(prePointer, curPointer);
+				this.rotateElement(prePoint, curPoint);
 				break;
 			case 'cut':
 				// todo:  这里需要写入 cut 的逻辑结构
