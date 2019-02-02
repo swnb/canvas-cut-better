@@ -1,6 +1,6 @@
 import { Render } from './render';
 import { Handler, Rotater } from './element';
-import { getCosDeg, getSinDeg } from './utils';
+import { getCosDeg, getSinDeg, abVector } from './utils';
 
 export class CanvasCut {
 	private context: CanvasRenderingContext2D;
@@ -16,36 +16,15 @@ export class CanvasCut {
 		this.rotater = rotater;
 	}
 
-	public createElement = () => {
-		const ele = new Handler([[25, 25], [75, 25], [25, 75]]);
+	public createElement = (paths: Paths) => {
+		const ele = new Handler(paths);
 		ele.attachContext(this.context);
 		this.elements.push(ele);
 		this.render.registRender(ele);
 	}
 
-	public destory = () => {
-		this.render.clear();
-	}
-
-	public selectElement = (pos: Pos) => {
-		if (this.rotater.isPointInside(pos)) {
-			this.currenOprateMode = 'rotate';
-			return
-		}
-
-		for (const element of this.elements) {
-			if (element.isPointInside(pos)) {
-				this.currenOprateMode = 'move';
-				this.currentSelectedElement = element;
-				this.rotater.bindElement(element);
-				return;
-			}
-		}
-
-		// when no element is selected, clear state and set cut mode;
-		this.currenOprateMode = 'cut';
-		this.currentSelectedElement = null;
-		this.rotater.destory();
+	public startAnimation = () => {
+		// TODO 写入开启的动画
 	}
 
 	public receivePointerDown = (point: Pos) => {
@@ -72,27 +51,48 @@ export class CanvasCut {
 		this.currenOprateMode = 'none';
 	}
 
-	public startAnimation = () => {
-		// todo: 写入开启的动画
+	public destory = () => {
+		this.elements = [];
+		this.render.clear();
 	}
 
-	private moveElement = ([preX, preY]: Pos, [cX, cY]: Pos) => {
+	private selectElement = (pos: Pos) => {
+		if (this.rotater.isPointInside(pos)) {
+			this.currenOprateMode = 'rotate';
+			return
+		}
+
+		for (const element of this.elements) {
+			if (element.isPointInside(pos)) {
+				this.currenOprateMode = 'move';
+				this.currentSelectedElement = element;
+				this.rotater.bindElement(element);
+				return;
+			}
+		}
+
+		// when no element is selected, clear state and set cut mode;
+		this.currenOprateMode = 'cut';
+		this.currentSelectedElement = null;
+		this.rotater.destory();
+	}
+
+	private moveElement = (prePos: Pos, currentPos: Pos) => {
 		if (!this.currentSelectedElement) return
 
 		this.currentSelectedElement.changeState();
-		const moveVector: Vector = [cX - preX, cY - preY]
-		this.currentSelectedElement.move(moveVector);
+		this.currentSelectedElement.move(abVector(prePos, currentPos));
 	}
 
-	private rotateElement = ([preX, preY]: Pos, [cX, cY]: Pos) => {
+	private rotateElement = (prePos: Pos, currentPos: Pos) => {
 		if (!this.currentSelectedElement) return;
 
 		this.currentSelectedElement.changeState();
-		const [centerX, centerY] = this.currentSelectedElement.getCenterPionter();
-		const baseVector: Vector = [preX - centerX, preY - centerY];
-		const moveVector: Vector = [cX - centerX, cY - centerY];
-		const cosDeg = getCosDeg(baseVector, moveVector);
-		const sinDeg = getSinDeg(baseVector, moveVector);
+		const originPos = this.currentSelectedElement.getCenterPionter();
+		const preVector: Vector = abVector(originPos, prePos);
+		const currentVector: Vector = abVector(originPos, currentPos);
+		const cosDeg = getCosDeg(preVector, currentVector);
+		const sinDeg = getSinDeg(preVector, currentVector);
 		this.currentSelectedElement.rotate(cosDeg, sinDeg);
 		this.rotater.rotate(cosDeg, sinDeg);
 	}
@@ -104,9 +104,7 @@ export const attachContext = (canvas: HTMLCanvasElement) => {
 	// render
 	const render = Render.getInstance();
 	// clear every render
-	render.unshift(() => {
-		context.clearRect(0, 0, canvas.width, canvas.height)
-	});
+	render.unshift(() => { context.clearRect(0, 0, canvas.width, canvas.height); });
 	// rotater
 	const rotater = new Rotater(context);
 	render.push(rotater.render);

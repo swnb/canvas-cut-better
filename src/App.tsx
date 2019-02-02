@@ -3,9 +3,7 @@ import './App.css';
 import { CanvasCutComponent } from 'canvas-cut';
 
 class App extends React.Component {
-	public render() {
-		return <CanvasCutComponent />;
-	}
+	public render = () => <CanvasCutComponent />;
 }
 
 export default App;
