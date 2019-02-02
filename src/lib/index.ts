@@ -89,11 +89,10 @@ export class CanvasCut {
 
 	private rotateElement = (prePos: Pos, currentPos: Pos) => {
 		if (!this.currentSelectedElement) return;
-
-		const originPos = this.currentSelectedElement.getCenterPionter();
+		const { currentSelectedElement } = this;
+		const originPos = currentSelectedElement.getCenterPionter();
 		const [cosDeg, sinDeg] = countDeg(originPos, prePos, currentPos);
-		this.currentSelectedElement.rotate(cosDeg, sinDeg);
-		this.rotater.rotate(cosDeg, sinDeg);
+		currentSelectedElement.rotate(cosDeg, sinDeg);
 	}
 }
 

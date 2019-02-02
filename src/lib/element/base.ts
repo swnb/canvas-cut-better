@@ -1,4 +1,5 @@
 import { affineTransformation, linearMove, countCenterPos } from 'lib/utils';
+import { totalDegPlus } from 'lib/utils';
 
 export abstract class BaseElement {
 	public key = Symbol();
@@ -7,6 +8,7 @@ export abstract class BaseElement {
 	// private originPaths: Paths;
 	private recordPathsQueue: Paths[] = [];
 	private currentPaths: Paths;
+	private totalCosSinDeg: [number, number] = [1, 0];
 
 	constructor(paths: Pos[]) {
 		this.centerPoint = countCenterPos(paths)
@@ -15,6 +17,10 @@ export abstract class BaseElement {
 	}
 
 	public getCenterPionter = () => [...this.centerPoint] as Pos;
+
+	public getPaths = () => [...this.currentPaths] as Paths;
+
+	public getTotalCosSinDeg = () => [...this.totalCosSinDeg] as [number, number];
 
 	public move = (vector: Pos) => {
 		const { centerPoint, currentPaths } = this;
@@ -30,6 +36,7 @@ export abstract class BaseElement {
 		for (let i = 0; i < currentPaths.length; i++) {
 			currentPaths[i] = affineTransformation(cosDeg, sinDeg, currentPaths[i], this.centerPoint)
 		}
+		this.totalCosSinDeg = totalDegPlus(this.totalCosSinDeg, [cosDeg, sinDeg]);
 		this.changeState();
 	}
 
