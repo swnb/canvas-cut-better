@@ -1,5 +1,5 @@
 export enum ElementNames {
-	Triangle = 100,
+	Triangle = 1,
 	Parallelogram,
 	Echelon,
 	Irregular,

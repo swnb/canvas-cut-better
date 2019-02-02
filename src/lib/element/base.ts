@@ -1,6 +1,6 @@
 import { affineTransformation, linearMove, countCenterPos } from 'lib/utils';
 
-export class BaseElement {
+export abstract class BaseElement {
 	public key = Symbol();
 
 	private centerPoint: Pos;
@@ -16,22 +16,21 @@ export class BaseElement {
 
 	public getCenterPionter = () => [...this.centerPoint] as Pos;
 
-	public draw = (path2d: Path2D) => {
-		const { currentPaths } = this;
-		path2d.moveTo(...currentPaths[0]);
-		for (let i = 1; i < currentPaths.length; i++) {
-			path2d.lineTo(...currentPaths[i]);
-		}
-		path2d.closePath();
-	}
-
 	public move = (vector: Pos) => {
-		this.currentPaths = this.currentPaths.map(pos => linearMove(pos, vector));
-		this.centerPoint = linearMove(this.centerPoint, vector)
+		const { centerPoint, currentPaths } = this;
+		for (let i = 0; i < currentPaths.length; i++) {
+			currentPaths[i] = linearMove(currentPaths[i], vector)
+		}
+		this.centerPoint = linearMove(centerPoint, vector)
+		this.changeState();
 	}
 
 	public rotate = (cosDeg: number, sinDeg: number) => {
-		this.currentPaths = this.currentPaths.map(pos => affineTransformation(cosDeg, sinDeg, pos, this.centerPoint));
+		const { currentPaths } = this;
+		for (let i = 0; i < currentPaths.length; i++) {
+			currentPaths[i] = affineTransformation(cosDeg, sinDeg, currentPaths[i], this.centerPoint)
+		}
+		this.changeState();
 	}
 
 	public record = () => {
@@ -39,6 +38,24 @@ export class BaseElement {
 	}
 
 	public cut = (vector: Pos) => {
+		// TODO write cut logic in here
 		return void (0);
 	}
+
+	protected drawPath2d = () => {
+		const path2d = new Path2D()
+		const { currentPaths } = this;
+		path2d.moveTo(...currentPaths[0]);
+		for (let i = 1; i < currentPaths.length; i++) {
+			path2d.lineTo(...currentPaths[i]);
+		}
+		path2d.closePath();
+		return path2d;
+	}
+
+	protected abstract save(): void;
+
+	protected abstract reStore(): void;
+
+	protected abstract changeState(): void;
 }

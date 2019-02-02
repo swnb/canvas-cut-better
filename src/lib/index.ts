@@ -1,13 +1,15 @@
 import { Render } from './render';
 import { Handler, Rotater } from './element';
-import { getCosDeg, getSinDeg, abVector } from './utils';
+import { abVector, countDeg } from './utils';
+
+enum OprateMode { move = 1, rotate, cut, none };
 
 export class CanvasCut {
 	private context: CanvasRenderingContext2D;
 	private render: Render
 	private elements: Handler[] = [];
 	private rotater: Rotater;
-	private currenOprateMode: 'move' | 'rotate' | 'cut' | 'none' = 'cut';
+	private currenOprateMode: OprateMode = OprateMode.cut;
 	private currentSelectedElement: Handler | null = null;
 
 	constructor(context: CanvasRenderingContext2D, render: Render, rotater: Rotater) {
@@ -33,22 +35,22 @@ export class CanvasCut {
 
 	public receivePointerMove = (prePoint: Pos, curPoint: Pos) => {
 		switch (this.currenOprateMode) {
-			case 'move':
+			case OprateMode.move:
 				this.moveElement(prePoint, curPoint);
 				break;
-			case 'rotate':
+			case OprateMode.rotate:
 				this.rotateElement(prePoint, curPoint);
 				break;
-			case 'cut':
-				// todo:  这里需要写入 cut 的逻辑结构
+			case OprateMode.cut:
+				// TODO  这里需要写入 cut 的逻辑结构
 				break;
-			case 'none':
+			case OprateMode.none:
 				break;
 		}
 	}
 
 	public receivePointerUp = () => {
-		this.currenOprateMode = 'none';
+		this.currenOprateMode = OprateMode.none;
 	}
 
 	public destory = () => {
@@ -57,14 +59,16 @@ export class CanvasCut {
 	}
 
 	private selectElement = (pos: Pos) => {
+		// point at rotater
 		if (this.rotater.isPointInside(pos)) {
-			this.currenOprateMode = 'rotate';
+			this.currenOprateMode = OprateMode.rotate;
 			return
 		}
 
+		// point at render element
 		for (const element of this.elements) {
 			if (element.isPointInside(pos)) {
-				this.currenOprateMode = 'move';
+				this.currenOprateMode = OprateMode.move;
 				this.currentSelectedElement = element;
 				this.rotater.bindElement(element);
 				return;
@@ -72,7 +76,7 @@ export class CanvasCut {
 		}
 
 		// when no element is selected, clear state and set cut mode;
-		this.currenOprateMode = 'cut';
+		this.currenOprateMode = OprateMode.cut;
 		this.currentSelectedElement = null;
 		this.rotater.destory();
 	}
@@ -80,19 +84,14 @@ export class CanvasCut {
 	private moveElement = (prePos: Pos, currentPos: Pos) => {
 		if (!this.currentSelectedElement) return
 
-		this.currentSelectedElement.changeState();
 		this.currentSelectedElement.move(abVector(prePos, currentPos));
 	}
 
 	private rotateElement = (prePos: Pos, currentPos: Pos) => {
 		if (!this.currentSelectedElement) return;
 
-		this.currentSelectedElement.changeState();
 		const originPos = this.currentSelectedElement.getCenterPionter();
-		const preVector: Vector = abVector(originPos, prePos);
-		const currentVector: Vector = abVector(originPos, currentPos);
-		const cosDeg = getCosDeg(preVector, currentVector);
-		const sinDeg = getSinDeg(preVector, currentVector);
+		const [cosDeg, sinDeg] = countDeg(originPos, prePos, currentPos);
 		this.currentSelectedElement.rotate(cosDeg, sinDeg);
 		this.rotater.rotate(cosDeg, sinDeg);
 	}
