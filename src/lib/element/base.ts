@@ -1,4 +1,4 @@
-import { affineTransformation, linearMove, countCenterPointer } from 'lib/utils';
+import { affineTransformation, linearMove, countCenterPos } from 'lib/utils';
 
 export class BaseElement {
 	public key = Symbol();
@@ -9,7 +9,7 @@ export class BaseElement {
 	private currentPaths: Paths;
 
 	constructor(paths: Pos[]) {
-		this.centerPoint = countCenterPointer(paths)
+		this.centerPoint = countCenterPos(paths)
 		// this.originPaths = [...paths];
 		this.currentPaths = [...paths];
 	}

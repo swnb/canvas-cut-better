@@ -56,7 +56,6 @@ export class CanvasCut {
 		switch (this.currenOprateMode) {
 			case 'move':
 				this.moveElement(prePointer, curPointer);
-				this.rotater.changeState();
 				break;
 			case 'rotate':
 				this.rotateElement(prePointer, curPointer);
@@ -95,6 +94,7 @@ export class CanvasCut {
 		const cosDeg = getCosDeg(baseVector, moveVector);
 		const sinDeg = getSinDeg(baseVector, moveVector);
 		this.currentSelectedElement.rotate(cosDeg, sinDeg);
+		this.rotater.rotate(cosDeg, sinDeg);
 	}
 }
 

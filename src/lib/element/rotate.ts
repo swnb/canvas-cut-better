@@ -1,7 +1,7 @@
 import { RenderElement } from 'lib/render';
 import { Color } from './color';
-import { Handler } from './hander';
-import { affineTransformation } from 'lib/utils';
+import { Handler } from './handler';
+import { affineTransformation, isSamePos, abVector, abPlus } from 'lib/utils';
 
 interface Options {
 	color?: Color
@@ -14,8 +14,9 @@ export class Rotater implements RenderElement {
 	private context: CanvasRenderingContext2D;
 	private color: Color;
 	private path2d: Path2D | null = null;
-	private pointer: Pos = [0, 0];
+	private pointer: Pos | null = null
 	private currentElement: Handler | null = null;
+	private prePointer: Pos | null = null;
 	private isChange = false;
 
 	constructor(context: CanvasRenderingContext2D, options: Options = {}) {
@@ -24,10 +25,21 @@ export class Rotater implements RenderElement {
 	}
 
 	public render = () => {
-		if (!this.currentElement) return;
+		if (!this.currentElement || !this.pointer) return;
+
+		const elementRelPos = this.relPos(this.currentElement.getCenterPionter());
+
+		if (this.prePointer && !isSamePos(elementRelPos, this.prePointer)) {
+			// element moved
+			const abV = abVector(this.prePointer, elementRelPos);
+			this.setNewPaths(abPlus(this.pointer, abV));
+			this.prePointer = elementRelPos;
+		}
 
 		if (this.isChange) {
-			this.setNewPath()
+			this.path2d = new Path2D()
+			const [x, y] = this.pointer;
+			this.path2d.arc(x, y, 10, 0, 2 * Math.PI)
 			this.isChange = false;
 		}
 
@@ -42,38 +54,37 @@ export class Rotater implements RenderElement {
 	}
 
 	public bindElement = (element: Handler) => {
-		if (this.currentElement && this.currentElement.key === element.key) return;
+		if (this.currentElement && this.currentElement === element) return;
 
 		this.currentElement = element;
-		this.changeState();
+		this.prePointer = this.relPos(element.getCenterPionter());
+		this.setNewPaths(this.prePointer);
 	}
 
 	public isPointerInside = (pointer: Pos) => {
 		if (this.path2d) {
 			return this.context.isPointInPath(this.path2d, ...pointer);
 		}
-		return false
+		return false;
 	}
 
 	public rotate = (cosDeg: number, sinDeg: number) => {
-		if (!this.currentElement) return;
+		if (!this.currentElement || !this.pointer) return;
 
-		const centerPointer = this.currentElement.getCenterPionter()
-		this.pointer = affineTransformation(cosDeg, sinDeg, this.pointer, centerPointer);
+		const centerPointer = this.currentElement.getCenterPionter();
+		this.setNewPaths(affineTransformation(cosDeg, sinDeg, this.pointer, centerPointer));
 	}
 
 	public changeState = () => {
 		if (!this.isChange) this.isChange = true;
 	}
 
-	private setNewPath = () => {
-		this.path2d = this.drawPath2d((this.currentElement as Handler).getCenterPionter());
-	}
+	private relPos = ([x, y]: Pos): Pos => [x, y - 30];
 
-	private drawPath2d = ([cx, cy]: Pos) => {
-		const path2d = new Path2D();
-		path2d.arc(cx, cy - 20, 10, 2 * Math.PI, 0);
-		return path2d;
+	private setNewPaths = (pos: Pos) => {
+		this.pointer = pos;
+
+		this.changeState();
 	}
 }
 

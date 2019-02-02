@@ -1,2 +1,2 @@
-export { Handler } from "./hander";
+export { Handler } from "./handler";
 export { Rotater } from './rotate';
