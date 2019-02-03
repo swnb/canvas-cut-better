@@ -1,8 +1,9 @@
 import { Render } from './render';
 import { Handler } from './element';
-import { abVector, countDeg } from './utils';
+import { abVector, countDeg, analysis } from './utils';
 import { Rotater } from './rotater';
 import { Wire } from './wire';
+import { Color } from './element/color';
 
 enum OprateMode { move = 1, rotate, cut, none };
 
@@ -55,13 +56,23 @@ export class CanvasCut {
 	}
 
 	public receivePointerUp = () => {
-		// TODO 添加各种情况
-		this.wire.destory();
+		switch (this.currenOprateMode) {
+			case OprateMode.move:
+				break
+			case OprateMode.rotate:
+				break;
+			case OprateMode.cut:
+				this.searchCutElement()
+				this.wire.destory();
+				break;
+		}
 		this.currenOprateMode = OprateMode.none;
 	}
 
 	public destory = () => {
 		this.elements = [];
+		this.rotater.destory();
+		this.wire.destory();
 		this.render.clear();
 	}
 
@@ -101,6 +112,22 @@ export class CanvasCut {
 		const originPos = currentSelectedElement.getCenterPionter();
 		const [cosDeg, sinDeg] = countDeg(originPos, prePos, currentPos);
 		currentSelectedElement.rotate(cosDeg, sinDeg);
+	}
+
+	private searchCutElement = () => {
+		const result: Handler[] = [];
+		window.console.time("search")
+		const lineSegment = this.wire.getLineSegment();
+		for (const sample of analysis(lineSegment)) {
+			for (const element of this.elements) {
+				if (element.isPointInside(sample)) {
+					result.push(element);
+					element.setColor(new Color(200, 200, 100));
+				}
+			}
+		}
+		window.console.timeEnd("search");
+		return result;
 	}
 }
 

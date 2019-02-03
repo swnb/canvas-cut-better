@@ -1,7 +1,8 @@
 import { ab, aXb, abVector } from './matrix';
 
-// distance get distance os two point;
-export const absAB = ([ax, ay]: Vector, [bx, by]: Vector) => Math.sqrt(((ax ** 2) + (ay ** 2)) * ((bx ** 2) + (by ** 2)));
+export const distanceAB = ([ax, ay]: Vector, [bx, by]: Vector) => Math.sqrt(((bx - ax) ** 2) + ((by - ay) ** 2));
+// equal to |a||b|;
+const absAB = ([ax, ay]: Vector, [bx, by]: Vector) => Math.sqrt(((ax ** 2) + (ay ** 2)) * ((bx ** 2) + (by ** 2)));
 
 export const getCosDeg = (aVector: Vector, bVector: Vector) => ab(aVector, bVector) / (absAB(aVector, bVector));
 

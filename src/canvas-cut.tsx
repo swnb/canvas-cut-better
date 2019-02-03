@@ -57,8 +57,8 @@ export class CanvasCutComponent extends React.PureComponent {
 		this.prePos = nextPos;
 	};
 
-	private onPointerUp = () => {
-		if (!this.cc) return;
+	private onPointerUp = (event: ReactEvent) => {
+		if (!this.startOprate || !this.cc) return;
 		this.cc.receivePointerUp();
 		this.startOprate = false;
 	};

@@ -1,6 +1,5 @@
 import { RenderElement } from 'lib/render';
 
-const { MIN_SAFE_INTEGER } = Number;
 const { assign, create } = Object;
 
 interface ContextConfig {
@@ -14,8 +13,8 @@ export class Wire implements RenderElement {
 
 	private context: CanvasRenderingContext2D;
 	private path2d = new Path2D();
-	private fixedPoint: Pos = [MIN_SAFE_INTEGER, MIN_SAFE_INTEGER];
-	private movingPoint: Pos = [MIN_SAFE_INTEGER, MIN_SAFE_INTEGER];
+	private fixedPoint: Pos = [0, 0];
+	private movingPoint: Pos = [0, 0];
 	private isChange = false;
 	private preContextConfig: ContextConfig = create(null);
 	private wireContextConfig: ContextConfig;
@@ -43,6 +42,7 @@ export class Wire implements RenderElement {
 
 	public setFixedPoint = (point: Pos) => {
 		this.fixedPoint = point;
+		this.movingPoint = point;
 		this.changeState();
 	}
 
@@ -51,18 +51,18 @@ export class Wire implements RenderElement {
 		this.changeState();
 	}
 
+	public getLineSegment = (): LineSegment => [this.fixedPoint, this.movingPoint];
+
 	public destory = () => {
-		this.fixedPoint = [MIN_SAFE_INTEGER, MIN_SAFE_INTEGER];
-		this.movingPoint = [MIN_SAFE_INTEGER, MIN_SAFE_INTEGER];
+		this.fixedPoint = [0, 0];
+		this.movingPoint = [0, 0];
 		this.changeState();
 	}
 
 	private save = () => {
 		const { preContextConfig, context } = this;
 		const { lineCap, lineWidth, strokeStyle } = context;
-		preContextConfig.strokeStyle = strokeStyle;
-		preContextConfig.lineCap = lineCap;
-		preContextConfig.lineWidth = lineWidth
+		assign(preContextConfig, { strokeStyle, lineCap, lineWidth });
 	}
 
 	private restore = () => {
