@@ -1,7 +1,7 @@
 import { RenderElement } from 'lib/render';
-import { Color } from './color';
+import { Color } from '../element/color';
 import { affineTransformation, isSamePos, } from 'lib/utils';
-import { BaseElement } from './base';
+import { BaseElement } from '../element/base';
 
 interface Options {
 	color?: Color

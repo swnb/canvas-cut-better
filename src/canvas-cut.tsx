@@ -20,7 +20,7 @@ export class CanvasCutComponent extends React.PureComponent {
 		const canvas = (this.ref.current as HTMLCanvasElement) as HTMLCanvasElement;
 		this.cc = attachContext(canvas);
 		for (let i = 0; i < 10; i++) {
-			this.cc.createElement([[25, 25], [75, 25], [25, 75]]);
+			this.cc.createElement([[25, 25], [75, 25], [75, 89], [25, 75]]);
 		}
 		window.addEventListener('resize', this.setSize);
 	};
@@ -57,8 +57,8 @@ export class CanvasCutComponent extends React.PureComponent {
 		this.prePos = nextPos;
 	};
 
-	private onPointerUp = () => {
-		if (!this.cc) return;
+	private onPointerUp = (event: ReactEvent) => {
+		if (!this.startOprate || !this.cc) return;
 		this.cc.receivePointerUp();
 		this.startOprate = false;
 	};

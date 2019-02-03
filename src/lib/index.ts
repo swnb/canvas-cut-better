@@ -1,6 +1,9 @@
 import { Render } from './render';
-import { Handler, Rotater } from './element';
-import { abVector, countDeg } from './utils';
+import { Handler } from './element';
+import { abVector, countDeg, analysis } from './utils';
+import { Rotater } from './rotater';
+import { Wire } from './wire';
+import { Color } from './element/color';
 
 enum OprateMode { move = 1, rotate, cut, none };
 
@@ -9,13 +12,15 @@ export class CanvasCut {
 	private render: Render
 	private elements: Handler[] = [];
 	private rotater: Rotater;
+	private wire: Wire;
 	private currenOprateMode: OprateMode = OprateMode.cut;
 	private currentSelectedElement: Handler | null = null;
 
-	constructor(context: CanvasRenderingContext2D, render: Render, rotater: Rotater) {
+	constructor(context: CanvasRenderingContext2D, render: Render, rotater: Rotater, wire: Wire) {
 		this.context = context;
 		this.render = render;
 		this.rotater = rotater;
+		this.wire = wire;
 	}
 
 	public createElement = (paths: Paths) => {
@@ -42,6 +47,7 @@ export class CanvasCut {
 				this.rotateElement(prePoint, curPoint);
 				break;
 			case OprateMode.cut:
+				this.wire.move(curPoint);
 				// TODO  这里需要写入 cut 的逻辑结构
 				break;
 			case OprateMode.none:
@@ -50,11 +56,23 @@ export class CanvasCut {
 	}
 
 	public receivePointerUp = () => {
+		switch (this.currenOprateMode) {
+			case OprateMode.move:
+				break
+			case OprateMode.rotate:
+				break;
+			case OprateMode.cut:
+				this.searchCutElement()
+				this.wire.destory();
+				break;
+		}
 		this.currenOprateMode = OprateMode.none;
 	}
 
 	public destory = () => {
 		this.elements = [];
+		this.rotater.destory();
+		this.wire.destory();
 		this.render.clear();
 	}
 
@@ -77,6 +95,7 @@ export class CanvasCut {
 
 		// when no element is selected, clear state and set cut mode;
 		this.currenOprateMode = OprateMode.cut;
+		this.wire.setFixedPoint(pos);
 		this.currentSelectedElement = null;
 		this.rotater.destory();
 	}
@@ -94,6 +113,22 @@ export class CanvasCut {
 		const [cosDeg, sinDeg] = countDeg(originPos, prePos, currentPos);
 		currentSelectedElement.rotate(cosDeg, sinDeg);
 	}
+
+	private searchCutElement = () => {
+		const result: Handler[] = [];
+		window.console.time("search")
+		const lineSegment = this.wire.getLineSegment();
+		for (const sample of analysis(lineSegment)) {
+			for (const element of this.elements) {
+				if (element.isPointInside(sample)) {
+					result.push(element);
+					element.setColor(new Color(200, 200, 100));
+				}
+			}
+		}
+		window.console.timeEnd("search");
+		return result;
+	}
 }
 
 export const attachContext = (canvas: HTMLCanvasElement) => {
@@ -107,5 +142,8 @@ export const attachContext = (canvas: HTMLCanvasElement) => {
 	const rotater = new Rotater(context);
 	render.push(rotater.render);
 
-	return new CanvasCut(context, render, rotater);
+	const wire = new Wire(context);
+	render.push(wire.render);
+
+	return new CanvasCut(context, render, rotater, wire);
 }

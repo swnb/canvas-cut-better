@@ -62,7 +62,7 @@ export abstract class BaseElement {
 
 	protected abstract save(): void;
 
-	protected abstract reStore(): void;
+	protected abstract restore(): void;
 
 	protected abstract changeState(): void;
 }

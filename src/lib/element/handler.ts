@@ -48,7 +48,7 @@ export class Handler extends BaseElement implements RenderElement {
 				ctx.stroke(path2d);
 				break
 		}
-		this.reStore();
+		this.restore();
 	}
 
 	protected changeState = () => {
@@ -66,7 +66,7 @@ export class Handler extends BaseElement implements RenderElement {
 		}
 	}
 
-	protected reStore = () => {
+	protected restore = () => {
 		switch (this.drawMode) {
 			case DrawMode.fill:
 				this.ctx.fillStyle = this.preDrawStyle;
