@@ -1,6 +1,7 @@
 import { Render } from './render';
-import { Handler, Rotater } from './element';
+import { Handler } from './element';
 import { abVector, countDeg } from './utils';
+import { Rotater } from './rotater';
 
 enum OprateMode { move = 1, rotate, cut, none };
 
