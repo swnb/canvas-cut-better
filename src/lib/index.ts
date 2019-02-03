@@ -2,6 +2,7 @@ import { Render } from './render';
 import { Handler } from './element';
 import { abVector, countDeg } from './utils';
 import { Rotater } from './rotater';
+import { Wire } from './wire';
 
 enum OprateMode { move = 1, rotate, cut, none };
 
@@ -10,13 +11,15 @@ export class CanvasCut {
 	private render: Render
 	private elements: Handler[] = [];
 	private rotater: Rotater;
+	private wire: Wire;
 	private currenOprateMode: OprateMode = OprateMode.cut;
 	private currentSelectedElement: Handler | null = null;
 
-	constructor(context: CanvasRenderingContext2D, render: Render, rotater: Rotater) {
+	constructor(context: CanvasRenderingContext2D, render: Render, rotater: Rotater, wire: Wire) {
 		this.context = context;
 		this.render = render;
 		this.rotater = rotater;
+		this.wire = wire;
 	}
 
 	public createElement = (paths: Paths) => {
@@ -43,6 +46,7 @@ export class CanvasCut {
 				this.rotateElement(prePoint, curPoint);
 				break;
 			case OprateMode.cut:
+				this.wire.move(curPoint);
 				// TODO  这里需要写入 cut 的逻辑结构
 				break;
 			case OprateMode.none:
@@ -51,6 +55,8 @@ export class CanvasCut {
 	}
 
 	public receivePointerUp = () => {
+		// TODO 添加各种情况
+		this.wire.destory();
 		this.currenOprateMode = OprateMode.none;
 	}
 
@@ -78,6 +84,7 @@ export class CanvasCut {
 
 		// when no element is selected, clear state and set cut mode;
 		this.currenOprateMode = OprateMode.cut;
+		this.wire.setFixedPoint(pos);
 		this.currentSelectedElement = null;
 		this.rotater.destory();
 	}
@@ -108,5 +115,8 @@ export const attachContext = (canvas: HTMLCanvasElement) => {
 	const rotater = new Rotater(context);
 	render.push(rotater.render);
 
-	return new CanvasCut(context, render, rotater);
+	const wire = new Wire(context);
+	render.push(wire.render);
+
+	return new CanvasCut(context, render, rotater, wire);
 }

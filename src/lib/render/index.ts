@@ -1,6 +1,6 @@
 export interface RenderElement {
 	key: symbol;
-	render(): void
+	render(): void;
 }
 
 export class Render {
