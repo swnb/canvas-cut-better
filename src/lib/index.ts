@@ -1,9 +1,8 @@
 import { Render } from './render';
-import { Handler, BaseElement, Sepatater } from './element';
+import { Handler, Element, Sepatater, Color } from './element';
 import { abVector, countDeg } from './utils';
 import { Rotater } from './rotater';
 import { Wire } from './wire';
-import { Color } from './element/color';
 
 enum OprateMode { move = 1, rotate, cut, none };
 
@@ -14,7 +13,7 @@ export class CanvasCut {
 	private wire: Wire;
 	private sepatater: Sepatater;
 	private currenOprateMode: OprateMode = OprateMode.cut;
-	private currentSelectedElement: BaseElement | null = null;
+	private currentSelectedElement: Element | null = null;
 
 	constructor(context: CanvasRenderingContext2D, render: Render, rotater: Rotater, wire: Wire, sepatater: Sepatater) {
 		this.context = context;

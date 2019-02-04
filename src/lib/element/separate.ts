@@ -1,5 +1,5 @@
 import { RenderElement } from 'lib/render';
-import { BaseElement } from 'lib/element';
+import { Element } from 'lib/element';
 import { distanceAB, abVector } from 'lib/utils';
 
 interface SepatatingElement {
@@ -29,7 +29,7 @@ export class Sepatater implements RenderElement {
 
 	private elements: Map<symbol, SepatatingElement> = new Map();
 
-	public addElement = (element: BaseElement, lineSegment: LineSegment) => {
+	public addElement = (element: Element, lineSegment: LineSegment) => {
 		const { key, move } = element;
 		const vector = countSepatateVector(element.getCenterPiont(), lineSegment);
 		this.elements.set(key, { distance2end: baseDistance, move, vector });

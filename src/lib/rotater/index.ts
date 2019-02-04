@@ -1,11 +1,9 @@
 import { RenderElement } from 'lib/render';
-import { Color } from '../element/color';
 import { affineTransformation, isSamePos, } from 'lib/utils';
-import { BaseElement } from '../element/base';
+import { Element, Color } from 'lib/element';
 
 interface Options {
 	color?: Color
-
 }
 
 export class Rotater implements RenderElement {
@@ -15,7 +13,7 @@ export class Rotater implements RenderElement {
 	private color: Color;
 	private preElementPoint: Pos = [Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER];
 	private path2d: Path2D = new Path2D();
-	private bindedElement: BaseElement | null = null;
+	private bindedElement: Element | null = null;
 
 	constructor(context: CanvasRenderingContext2D, options: Options = {}) {
 		this.context = context
@@ -40,7 +38,7 @@ export class Rotater implements RenderElement {
 		this.bindedElement = null;
 	}
 
-	public bindElement = (element: BaseElement) => {
+	public bindElement = (element: Element) => {
 		if (this.bindedElement && this.bindedElement === element) return;
 
 		this.bindedElement = element;
@@ -50,11 +48,11 @@ export class Rotater implements RenderElement {
 
 	public isPointInside = (point: Pos) => this.context.isPointInPath(this.path2d, ...point);
 
-	private recordElement = (element: BaseElement) => {
+	private recordElement = (element: Element) => {
 		this.preElementPoint = element.getPaths()[0];
 	}
 
-	private isBindedElementChange = (element: BaseElement) => !isSamePos(this.preElementPoint, element.getPaths()[0]);
+	private isBindedElementChange = (element: Element) => !isSamePos(this.preElementPoint, element.getPaths()[0]);
 
 	// TODO  better implement
 	private relPos = ([x, y]: Pos): Pos => [x, y - 30];
@@ -66,7 +64,7 @@ export class Rotater implements RenderElement {
 		return path2d;
 	}
 
-	private setNewPath2d = (element: BaseElement) => {
+	private setNewPath2d = (element: Element) => {
 		const [cosDeg, sinDeg] = element.getTotalCosSinDeg();
 		const originPos = element.getCenterPiont();
 		const point = affineTransformation(cosDeg, sinDeg, this.relPos(originPos), originPos);

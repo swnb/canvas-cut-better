@@ -2,9 +2,8 @@ import { affineTransformation, linearMove, countCenterPos, createSamples } from 
 import { totalDegPlus } from 'lib/utils';
 import { cut } from 'lib/element/cut';
 
-export abstract class BaseElement {
+export abstract class Element {
 	public key = Symbol();
-
 
 	private centerPoint: Pos;
 	// private originPaths: Paths;

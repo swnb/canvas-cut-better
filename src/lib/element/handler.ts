@@ -1,10 +1,10 @@
-import { BaseElement } from './base';
+import { Element } from './element';
 import { Color } from './color';
 import { RenderElement } from 'lib/render';
 
 export enum DrawMode { fill = 1, stroke };
 
-export class Handler extends BaseElement implements RenderElement {
+export class Handler extends Element implements RenderElement {
 	private isChange = true;
 
 	private drawMode: DrawMode = DrawMode.fill;
