@@ -1,8 +1,9 @@
 import { Render } from './render';
 import { Handler } from './element';
-import { abVector, countDeg, analysis } from './utils';
+import { abVector, countDeg } from './utils';
 import { Rotater } from './rotater';
 import { Wire } from './wire';
+import { getIntersections, cut } from './cutter';
 import { Color } from './element/color';
 
 enum OprateMode { move = 1, rotate, cut, none };
@@ -28,6 +29,7 @@ export class CanvasCut {
 		ele.attachContext(this.context);
 		this.elements.push(ele);
 		this.render.registRender(ele);
+		return ele;
 	}
 
 	public startAnimation = () => {
@@ -118,12 +120,16 @@ export class CanvasCut {
 		const result: Handler[] = [];
 		window.console.time("search")
 		const lineSegment = this.wire.getLineSegment();
-		for (const sample of analysis(lineSegment)) {
-			for (const element of this.elements) {
-				if (element.isPointInside(sample)) {
-					result.push(element);
-					element.setColor(new Color(200, 200, 100));
-				}
+		for (const element of this.elements) {
+			const intersections = getIntersections(element, lineSegment)
+			if (!intersections) continue;
+			// cut element;
+			const twoPaths = cut(element.getPaths(), intersections);
+			if (!twoPaths) continue;
+
+			for (const paths of twoPaths) {
+				const e = this.createElement(paths);
+				e.setColor(new Color(25, 100, 255));
 			}
 		}
 		window.console.timeEnd("search");
