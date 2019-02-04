@@ -1,9 +1,9 @@
 import { Render } from './render';
-import { Handler } from './element';
+import { Handler, BaseElement } from './element';
 import { abVector, countDeg } from './utils';
 import { Rotater } from './rotater';
 import { Wire } from './wire';
-import { getIntersections, cut } from './cutter';
+import { getIntersections, Sepatater } from './cutter';
 import { Color } from './element/color';
 
 enum OprateMode { move = 1, rotate, cut, none };
@@ -11,23 +11,23 @@ enum OprateMode { move = 1, rotate, cut, none };
 export class CanvasCut {
 	private context: CanvasRenderingContext2D;
 	private render: Render
-	private elements: Handler[] = [];
 	private rotater: Rotater;
 	private wire: Wire;
+	private sepatater: Sepatater;
 	private currenOprateMode: OprateMode = OprateMode.cut;
-	private currentSelectedElement: Handler | null = null;
+	private currentSelectedElement: BaseElement | null = null;
 
-	constructor(context: CanvasRenderingContext2D, render: Render, rotater: Rotater, wire: Wire) {
+	constructor(context: CanvasRenderingContext2D, render: Render, rotater: Rotater, wire: Wire, sepatater: Sepatater) {
 		this.context = context;
 		this.render = render;
 		this.rotater = rotater;
 		this.wire = wire;
+		this.sepatater = sepatater;
 	}
 
 	public createElement = (paths: Paths) => {
 		const ele = new Handler(paths);
 		ele.attachContext(this.context);
-		this.elements.push(ele);
 		this.render.registRender(ele);
 		return ele;
 	}
@@ -50,7 +50,6 @@ export class CanvasCut {
 				break;
 			case OprateMode.cut:
 				this.wire.move(curPoint);
-				// TODO  这里需要写入 cut 的逻辑结构
 				break;
 			case OprateMode.none:
 				break;
@@ -72,10 +71,11 @@ export class CanvasCut {
 	}
 
 	public destory = () => {
-		this.elements = [];
 		this.rotater.destory();
 		this.wire.destory();
+		this.sepatater.clear();
 		this.render.clear();
+
 	}
 
 	private selectElement = (pos: Pos) => {
@@ -86,7 +86,7 @@ export class CanvasCut {
 		}
 
 		// point at render element
-		for (const element of this.elements) {
+		for (const element of this.render.allElements()) {
 			if (element.isPointInside(pos)) {
 				this.currenOprateMode = OprateMode.move;
 				this.currentSelectedElement = element;
@@ -111,7 +111,7 @@ export class CanvasCut {
 	private rotateElement = (prePos: Pos, currentPos: Pos) => {
 		if (!this.currentSelectedElement) return;
 		const { currentSelectedElement } = this;
-		const originPos = currentSelectedElement.getCenterPionter();
+		const originPos = currentSelectedElement.getCenterPiont();
 		const [cosDeg, sinDeg] = countDeg(originPos, prePos, currentPos);
 		currentSelectedElement.rotate(cosDeg, sinDeg);
 	}
@@ -120,15 +120,16 @@ export class CanvasCut {
 		const result: Handler[] = [];
 		window.console.time("search")
 		const lineSegment = this.wire.getLineSegment();
-		for (const element of this.elements) {
+		for (const element of this.render.allElements()) {
 			const intersections = getIntersections(element, lineSegment)
 			if (!intersections) continue;
 			// cut element;
-			const twoPaths = cut(element.getPaths(), intersections);
+			const twoPaths = element.cut(intersections);
 			if (!twoPaths) continue;
-
+			this.render.remove(element);
 			for (const paths of twoPaths) {
 				const e = this.createElement(paths);
+				this.sepatater.addElement(e, intersections);
 				e.setColor(new Color(25, 100, 255));
 			}
 		}
@@ -147,9 +148,11 @@ export const attachContext = (canvas: HTMLCanvasElement) => {
 	// rotater
 	const rotater = new Rotater(context);
 	render.push(rotater.render);
-
+	// wire
 	const wire = new Wire(context);
 	render.push(wire.render);
-
-	return new CanvasCut(context, render, rotater, wire);
+	// sepatater
+	const sepatater = new Sepatater();
+	render.unshift(sepatater.render);
+	return new CanvasCut(context, render, rotater, wire, sepatater);
 }

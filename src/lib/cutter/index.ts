@@ -1,12 +1,13 @@
 import { createSamples } from 'lib/utils';
 import { findPointInsideLineSegment } from 'lib/utils/line-analysis';
+export { Sepatater } from './separate';
 
 interface Element {
 	isPointInside(pos: Pos): boolean;
 }
 // getIntersections use dichotomies to find the intersection points;
 export const getIntersections = ({ isPointInside }: Element, lineSegment: LineSegment): null | [Pos, Pos] => {
-	const samples = createSamples(lineSegment, 30);
+	const samples = createSamples(lineSegment, 20);
 	let intersectionInterval1: LineSegment | undefined;
 	let intersectionInterval2: LineSegment | undefined;
 	let searchFirstIntersection1 = true;

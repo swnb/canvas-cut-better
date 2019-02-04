@@ -1,3 +1,5 @@
+import { BaseElement } from 'lib/element';
+
 export interface RenderElement {
 	key: symbol;
 	render(): void;
@@ -9,12 +11,14 @@ export class Render {
 
 	private running = false;
 	private renderTimeID: number | null = null;
-	private renderElements: Map<symbol, RenderElement> = new Map();
+	private renderElements: Map<symbol, BaseElement> = new Map();
 
 	private beforeRenderCb: Array<() => void> = [];
 	private afterRenderCb: Array<() => void> = [];
 
-	public registRender = (element: RenderElement) => {
+	public allElements = () => this.renderElements.values();
+
+	public registRender = (element: BaseElement) => {
 		this.renderElements.set(element.key, element);
 		// check if this engine is stop or not;
 		if (!this.running) {
