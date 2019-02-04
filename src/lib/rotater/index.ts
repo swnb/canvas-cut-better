@@ -29,7 +29,7 @@ export class Rotater implements RenderElement {
 		}
 
 		const preDrawStyle = this.context.fillStyle;
-		this.context.fillStyle = this.color.getColor();
+		this.context.fillStyle = this.color.string;
 		this.context.fill(this.path2d);
 		this.context.fillStyle = preDrawStyle;
 	}

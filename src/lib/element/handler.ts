@@ -39,7 +39,7 @@ export class Handler extends Element implements RenderElement {
 		const { path2d } = this;
 
 		this.save();
-		ctx.fillStyle = color.getColor();
+		ctx.fillStyle = color.string;
 		switch (drawMode) {
 			case DrawMode.fill:
 				ctx.fill(path2d);
