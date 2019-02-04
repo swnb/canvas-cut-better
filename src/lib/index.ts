@@ -1,9 +1,8 @@
 import { Render } from './render';
-import { Handler, BaseElement } from './element';
+import { Handler, BaseElement, Sepatater } from './element';
 import { abVector, countDeg } from './utils';
 import { Rotater } from './rotater';
 import { Wire } from './wire';
-import { getIntersections, Sepatater } from './cutter';
 import { Color } from './element/color';
 
 enum OprateMode { move = 1, rotate, cut, none };
@@ -121,7 +120,7 @@ export class CanvasCut {
 		window.console.time("search")
 		const lineSegment = this.wire.getLineSegment();
 		for (const element of this.render.allElements()) {
-			const intersections = getIntersections(element, lineSegment)
+			const intersections = element.getIntersections(lineSegment);
 			if (!intersections) continue;
 			// cut element;
 			const twoPaths = element.cut(intersections);
