@@ -3,7 +3,7 @@ import { Handler } from './element';
 import { abVector, countDeg } from './utils';
 import { Rotater } from './rotater';
 import { Wire } from './wire';
-import { getIntersections, cut } from './cutter';
+import { getIntersections, cut, Sepatater } from './cutter';
 import { Color } from './element/color';
 
 enum OprateMode { move = 1, rotate, cut, none };
@@ -14,14 +14,16 @@ export class CanvasCut {
 	private elements: Handler[] = [];
 	private rotater: Rotater;
 	private wire: Wire;
+	private sepatater: Sepatater;
 	private currenOprateMode: OprateMode = OprateMode.cut;
 	private currentSelectedElement: Handler | null = null;
 
-	constructor(context: CanvasRenderingContext2D, render: Render, rotater: Rotater, wire: Wire) {
+	constructor(context: CanvasRenderingContext2D, render: Render, rotater: Rotater, wire: Wire, sepatater: Sepatater) {
 		this.context = context;
 		this.render = render;
 		this.rotater = rotater;
 		this.wire = wire;
+		this.sepatater = sepatater;
 	}
 
 	public createElement = (paths: Paths) => {
@@ -50,7 +52,6 @@ export class CanvasCut {
 				break;
 			case OprateMode.cut:
 				this.wire.move(curPoint);
-				// TODO  这里需要写入 cut 的逻辑结构
 				break;
 			case OprateMode.none:
 				break;
@@ -111,7 +112,7 @@ export class CanvasCut {
 	private rotateElement = (prePos: Pos, currentPos: Pos) => {
 		if (!this.currentSelectedElement) return;
 		const { currentSelectedElement } = this;
-		const originPos = currentSelectedElement.getCenterPionter();
+		const originPos = currentSelectedElement.getCenterPiont();
 		const [cosDeg, sinDeg] = countDeg(originPos, prePos, currentPos);
 		currentSelectedElement.rotate(cosDeg, sinDeg);
 	}
@@ -128,8 +129,11 @@ export class CanvasCut {
 			if (!twoPaths) continue;
 
 			for (const paths of twoPaths) {
+				// const cutVector = abVector(...intersections);
 				const e = this.createElement(paths);
+				this.sepatater.addElement(e, intersections);
 				e.setColor(new Color(25, 100, 255));
+				window.console.log(this.elements.length);
 			}
 		}
 		window.console.timeEnd("search");
@@ -147,9 +151,11 @@ export const attachContext = (canvas: HTMLCanvasElement) => {
 	// rotater
 	const rotater = new Rotater(context);
 	render.push(rotater.render);
-
+	// wire
 	const wire = new Wire(context);
 	render.push(wire.render);
-
-	return new CanvasCut(context, render, rotater, wire);
+	// sepatater
+	const sepatater = new Sepatater();
+	render.unshift(sepatater.render);
+	return new CanvasCut(context, render, rotater, wire, sepatater);
 }

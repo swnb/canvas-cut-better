@@ -68,7 +68,7 @@ export class Rotater implements RenderElement {
 
 	private setNewPath2d = (element: BaseElement) => {
 		const [cosDeg, sinDeg] = element.getTotalCosSinDeg();
-		const originPos = element.getCenterPionter();
+		const originPos = element.getCenterPiont();
 		const point = affineTransformation(cosDeg, sinDeg, this.relPos(originPos), originPos);
 		this.path2d = this.drawPos(point);
 		this.recordElement(element);

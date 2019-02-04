@@ -16,7 +16,7 @@ export abstract class BaseElement {
 		this.currentPaths = [...paths];
 	}
 
-	public getCenterPionter = () => [...this.centerPoint] as Pos;
+	public getCenterPiont = () => [...this.centerPoint] as Pos;
 
 	public getPaths = () => [...this.currentPaths] as Paths;
 

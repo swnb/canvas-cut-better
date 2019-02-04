@@ -1,5 +1,6 @@
 import { createSamples } from 'lib/utils';
 import { findPointInsideLineSegment } from 'lib/utils/line-analysis';
+export { Sepatater } from './separate';
 
 interface Element {
 	isPointInside(pos: Pos): boolean;
