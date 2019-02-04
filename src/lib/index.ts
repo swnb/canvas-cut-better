@@ -1,9 +1,9 @@
 import { Render } from './render';
-import { Handler } from './element';
+import { Handler, BaseElement } from './element';
 import { abVector, countDeg } from './utils';
 import { Rotater } from './rotater';
 import { Wire } from './wire';
-import { getIntersections, cut, Sepatater } from './cutter';
+import { getIntersections, Sepatater } from './cutter';
 import { Color } from './element/color';
 
 enum OprateMode { move = 1, rotate, cut, none };
@@ -11,12 +11,11 @@ enum OprateMode { move = 1, rotate, cut, none };
 export class CanvasCut {
 	private context: CanvasRenderingContext2D;
 	private render: Render
-	private elements: Handler[] = [];
 	private rotater: Rotater;
 	private wire: Wire;
 	private sepatater: Sepatater;
 	private currenOprateMode: OprateMode = OprateMode.cut;
-	private currentSelectedElement: Handler | null = null;
+	private currentSelectedElement: BaseElement | null = null;
 
 	constructor(context: CanvasRenderingContext2D, render: Render, rotater: Rotater, wire: Wire, sepatater: Sepatater) {
 		this.context = context;
@@ -29,7 +28,6 @@ export class CanvasCut {
 	public createElement = (paths: Paths) => {
 		const ele = new Handler(paths);
 		ele.attachContext(this.context);
-		this.elements.push(ele);
 		this.render.registRender(ele);
 		return ele;
 	}
@@ -73,10 +71,11 @@ export class CanvasCut {
 	}
 
 	public destory = () => {
-		this.elements = [];
 		this.rotater.destory();
 		this.wire.destory();
+		this.sepatater.clear();
 		this.render.clear();
+
 	}
 
 	private selectElement = (pos: Pos) => {
@@ -87,7 +86,7 @@ export class CanvasCut {
 		}
 
 		// point at render element
-		for (const element of this.elements) {
+		for (const element of this.render.allElements()) {
 			if (element.isPointInside(pos)) {
 				this.currenOprateMode = OprateMode.move;
 				this.currentSelectedElement = element;
@@ -121,19 +120,17 @@ export class CanvasCut {
 		const result: Handler[] = [];
 		window.console.time("search")
 		const lineSegment = this.wire.getLineSegment();
-		for (const element of this.elements) {
+		for (const element of this.render.allElements()) {
 			const intersections = getIntersections(element, lineSegment)
 			if (!intersections) continue;
 			// cut element;
-			const twoPaths = cut(element.getPaths(), intersections);
+			const twoPaths = element.cut(intersections);
 			if (!twoPaths) continue;
-
+			this.render.remove(element);
 			for (const paths of twoPaths) {
-				// const cutVector = abVector(...intersections);
 				const e = this.createElement(paths);
 				this.sepatater.addElement(e, intersections);
 				e.setColor(new Color(25, 100, 255));
-				window.console.log(this.elements.length);
 			}
 		}
 		window.console.timeEnd("search");

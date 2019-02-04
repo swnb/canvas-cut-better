@@ -27,7 +27,7 @@ const countSepatateVector = (centerPoint: Pos, [startPoint, endPoint]: LineSegme
 export class Sepatater implements RenderElement {
 	public key = Symbol();
 
-	public elements: Map<symbol, SepatatingElement> = new Map();
+	private elements: Map<symbol, SepatatingElement> = new Map();
 
 	public addElement = (element: BaseElement, lineSegment: LineSegment) => {
 		const { key, move } = element;
@@ -47,4 +47,6 @@ export class Sepatater implements RenderElement {
 			}
 		})
 	}
+
+	public clear = () => this.elements.clear();
 }

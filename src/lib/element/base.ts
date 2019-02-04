@@ -1,5 +1,6 @@
 import { affineTransformation, linearMove, countCenterPos } from 'lib/utils';
 import { totalDegPlus } from 'lib/utils';
+import { cut } from 'lib/cutter';
 
 export abstract class BaseElement {
 	public key = Symbol();
@@ -40,14 +41,15 @@ export abstract class BaseElement {
 		this.changeState();
 	}
 
+	public cut = (intersections: LineSegment): [Paths, Paths] | null => cut(this.currentPaths, intersections);
+
 	public record = () => {
 		this.recordPathsQueue.push([...this.currentPaths]);
 	}
 
-	public cut = (vector: Pos) => {
-		// TODO write cut logic in here
-		return void (0);
-	}
+	public abstract isPointInside(point: Pos): boolean;
+
+	public abstract render(): void;
 
 	protected drawPath2d = () => {
 		const path2d = new Path2D()
