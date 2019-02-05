@@ -4,17 +4,18 @@ import { RenderElement } from 'lib/render';
 
 export enum DrawMode { fill = 1, stroke };
 
-export class Handler extends Element implements RenderElement {
+export class GraphicsElement extends Element implements RenderElement {
 	private isChange = true;
 
 	private drawMode: DrawMode = DrawMode.fill;
 	private color: Color = new Color(107, 185, 240);
 	private preDrawStyle: string | CanvasGradient | CanvasPattern = "";
-	private ctx: CanvasRenderingContext2D;
+	private context: CanvasRenderingContext2D;
 	private path2d = new Path2D();
 
-	public attachContext = (context: CanvasRenderingContext2D) => {
-		this.ctx = context;
+	constructor(context: CanvasRenderingContext2D, paths: Pos[]) {
+		super(paths);
+		this.context = context;
 	}
 
 	public setColor = (color: Color) => {
@@ -25,11 +26,11 @@ export class Handler extends Element implements RenderElement {
 		this.drawMode = mode
 	}
 
-	public isPointInside = (point: Pos) => this.ctx.isPointInPath(this.path2d, ...point)
+	public isPointInside = (point: Pos) => this.context.isPointInPath(this.path2d, ...point)
 
 	public render = () => {
-		const { ctx, color, drawMode } = this;
-		if (!ctx) return;
+		const { context, color, drawMode } = this;
+		if (!context) return;
 
 		// path2d will reclare when element is change
 		if (this.isChange) {
@@ -39,14 +40,15 @@ export class Handler extends Element implements RenderElement {
 		const { path2d } = this;
 
 		this.save();
-		ctx.fillStyle = color.string;
 		switch (drawMode) {
 			case DrawMode.fill:
-				ctx.fill(path2d);
-				break
+				context.fillStyle = color.string;
+				context.fill(path2d);
+				break;
 			case DrawMode.stroke:
-				ctx.stroke(path2d);
-				break
+				context.strokeStyle = color.string;
+				context.stroke(path2d);
+				break;
 		}
 		this.restore();
 	}
@@ -58,22 +60,24 @@ export class Handler extends Element implements RenderElement {
 	protected save = () => {
 		switch (this.drawMode) {
 			case DrawMode.fill:
-				this.preDrawStyle = this.ctx.fillStyle;
-				break
+				this.preDrawStyle = this.context.fillStyle;
+				break;
 			case DrawMode.stroke:
-				this.preDrawStyle = this.ctx.strokeStyle;
-				break
+				this.preDrawStyle = this.context.strokeStyle;
+				break;
 		}
 	}
 
 	protected restore = () => {
 		switch (this.drawMode) {
 			case DrawMode.fill:
-				this.ctx.fillStyle = this.preDrawStyle;
-				break
+				this.context.fillStyle = this.preDrawStyle;
+				break;
 			case DrawMode.stroke:
-				this.ctx.strokeStyle = this.preDrawStyle;
-				break
+				this.context.strokeStyle = this.preDrawStyle;
+				break;
 		}
 	}
 }
+
+export const createGraphicsElement = (context: CanvasRenderingContext2D, paths: Paths) => new GraphicsElement(context, paths);

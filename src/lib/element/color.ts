@@ -4,7 +4,7 @@ export class Color {
 	}
 	public set r(value) {
 		this.pR = value;
-		this.updateColor();
+		this.changeState();
 	}
 
 	public get g() {
@@ -12,7 +12,7 @@ export class Color {
 	}
 	public set g(value) {
 		this.pG = value;
-		this.updateColor();
+		this.changeState();
 	}
 
 	public get b() {
@@ -20,7 +20,7 @@ export class Color {
 	}
 	public set b(value) {
 		this.pB = value;
-		this.updateColor();
+		this.changeState();
 	}
 
 	public get a() {
@@ -28,15 +28,15 @@ export class Color {
 	}
 	public set a(value) {
 		this.pA = value;
-		this.updateColor();
+		this.changeState();
 	}
 
 	private pR: number;
 	private pG: number;
 	private pB: number;
 	private pA: number;
-
 	private color: string;
+	private isChange = true;
 
 	constructor(r: number, g: number, b: number, a: number = 1) {
 		this.pR = r;
@@ -54,7 +54,15 @@ export class Color {
 		this.color = `rgba(${r},${g},${b},${a})`;
 	}
 
+	private changeState = () => {
+		if (!this.isChange) this.isChange = true;
+	}
+
 	public get string() {
+		if (this.isChange) {
+			this.updateColor();
+			this.isChange = false;
+		}
 		return this.color;
 	}
 
