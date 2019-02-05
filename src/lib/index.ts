@@ -1,5 +1,5 @@
 import { Render } from './render';
-import { Handler, Element, Sepatater, Color } from './element';
+import { createGraphicsElement, Element, Sepatater, Color, DrawMode } from './element';
 import { abVector, countDeg } from './utils';
 import { Rotater } from './rotater';
 import { Wire } from './wire';
@@ -24,8 +24,7 @@ export class CanvasCut {
 	}
 
 	public createElement = (paths: Paths) => {
-		const ele = new Handler(paths);
-		ele.attachContext(this.context);
+		const ele = createGraphicsElement(this.context, paths);
 		this.render.registRender(ele);
 		return ele;
 	}
@@ -116,7 +115,7 @@ export class CanvasCut {
 	}
 
 	private searchCutElement = () => {
-		const result: Handler[] = [];
+		const result: Element[] = [];
 		window.console.time("search")
 		const lineSegment = this.wire.getLineSegment();
 		for (const element of this.render.allElements()) {
@@ -129,7 +128,8 @@ export class CanvasCut {
 			for (const paths of twoPaths) {
 				const e = this.createElement(paths);
 				this.sepatater.addElement(e, intersections);
-				e.setColor(new Color(25, 100, 255));
+				e.setColor(new Color(255, 100, 20));
+				e.setDrawMode(DrawMode.stroke);
 			}
 		}
 		window.console.timeEnd("search");
