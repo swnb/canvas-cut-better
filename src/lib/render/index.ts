@@ -51,7 +51,9 @@ export class Render {
 		}
 	}
 
-	public isRunning = () => this.running;
+	public get isRunning() {
+		return this.running;
+	}
 
 	public clear = () => {
 		this.renderElements.clear();

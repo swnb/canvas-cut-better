@@ -1,6 +1,6 @@
 import { Render } from './render';
 import { createGraphicsElement, Element, Sepatater, Color, DrawMode } from './element';
-import { abVector, countDeg } from './utils';
+import { abVector, countDeg, countSepatateVector } from './utils';
 import { Rotater } from './rotater';
 import { Wire } from './wire';
 
@@ -115,7 +115,6 @@ export class CanvasCut {
 	}
 
 	private searchCutElement = () => {
-		const result: Element[] = [];
 		window.console.time("search")
 		const lineSegment = this.wire.getLineSegment();
 		for (const element of this.render.allElements()) {
@@ -126,15 +125,20 @@ export class CanvasCut {
 			if (!twoPaths) continue;
 			this.render.remove(element);
 			for (const paths of twoPaths) {
-				const e = this.createElement(paths);
-				this.sepatater.addElement(e, intersections);
-				e.setColor(new Color(255, 100, 20));
-				e.setDrawMode(DrawMode.stroke);
+				this.createChildElement(paths, intersections);
 			}
 		}
 		window.console.timeEnd("search");
-		return result;
 	}
+
+	private createChildElement = (paths: Paths, intersections: LineSegment) => {
+		const e = this.createElement(paths);
+		const sepatateVector = countSepatateVector(e.getCenterPiont(), intersections);
+		this.sepatater.addElement(e, sepatateVector);
+		e.setColor(new Color(255, 100, 20));
+		e.setDrawMode(DrawMode.fill);
+		setTimeout(e.stretchBack, 3000);
+	};
 }
 
 export const attachContext = (canvas: HTMLCanvasElement) => {
@@ -151,7 +155,7 @@ export const attachContext = (canvas: HTMLCanvasElement) => {
 	const wire = new Wire(context);
 	render.push(wire.render);
 	// sepatater
-	const sepatater = new Sepatater();
+	const sepatater = Sepatater.getInstance();
 	render.unshift(sepatater.render);
 	return new CanvasCut(context, render, rotater, wire, sepatater);
 }

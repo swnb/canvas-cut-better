@@ -1,49 +1,42 @@
 import { RenderElement } from 'lib/render';
 import { Element } from 'lib/element';
-import { distanceAB, abVector } from 'lib/utils';
+import { reduceVectorSize } from 'lib/utils';
 
 interface SepatatingElement {
+	totalDistance: number;
 	distance2end: number;
 	vector: Vector;
 	move(v: Vector): void;
 }
 
 const baseDistance = 20;
-const vectorSize = 0.8;
-
-const reduceVectorSize = ([x, y]: Vector, size: number): Vector => {
-	const ratio = Math.sqrt((x ** 2) + (y ** 2)) / size;
-	return [x / ratio, y / ratio];
-}
-
-const countSepatateVector = (centerPoint: Pos, [startPoint, endPoint]: LineSegment): Vector => {
-	const segmentLength1 = distanceAB(startPoint, centerPoint);
-	const segmentLength2 = distanceAB(centerPoint, endPoint);
-	const ratio = segmentLength1 / (segmentLength1 + segmentLength2)
-	const vector = abVector([(endPoint[0] - startPoint[0]) * ratio + startPoint[0], (endPoint[1] - startPoint[1]) * ratio + startPoint[1]], centerPoint);
-	return reduceVectorSize(vector, vectorSize);
-}
+const ratio = 0.04;
 
 export class Sepatater implements RenderElement {
+	public static getInstance = () => Sepatater.instance;
+	private static instance = new Sepatater();
 	public key = Symbol();
 
 	private elements: Map<symbol, SepatatingElement> = new Map();
 
-	public addElement = (element: Element, lineSegment: LineSegment) => {
-		const { key, move } = element;
-		const vector = countSepatateVector(element.getCenterPiont(), lineSegment);
-		this.elements.set(key, { distance2end: baseDistance, move, vector });
+	public addElement = ({ key, move }: Element, vector: Vector, distance: number = baseDistance) => {
+		this.elements.set(key, {
+			vector: reduceVectorSize(vector, distance * ratio),
+			totalDistance: distance,
+			distance2end: distance,
+			move,
+		});
 	}
 
 	public render = () => {
 		const { elements } = this;
 		elements.forEach((element, key) => {
-			const { move, vector, distance2end } = element;
+			const { move, vector, distance2end, totalDistance } = element;
 			if (distance2end <= 0) {
 				elements.delete(key);
 			} else {
 				move(vector);
-				element.distance2end = distance2end - vectorSize;
+				element.distance2end = distance2end - (totalDistance * ratio);
 			}
 		})
 	}

@@ -5,15 +5,15 @@ import { cut } from 'lib/element/cut';
 export abstract class Element {
 	public key = Symbol();
 
-	private centerPoint: Pos;
-	// private originPaths: Paths;
-	private recordPathsQueue: Paths[] = [];
-	private currentPaths: Paths;
-	private totalCosSinDeg: [number, number] = [1, 0];
+	protected centerPoint: Pos;
+	protected originPaths: Paths;
+	protected recordPathsQueue: Paths[] = [];
+	protected currentPaths: Paths;
+	protected totalCosSinDeg: [number, number] = [1, 0];
 
 	constructor(paths: Pos[]) {
 		this.centerPoint = countCenterPos(paths)
-		// this.originPaths = [...paths];
+		this.originPaths = [...paths];
 		this.currentPaths = [...paths];
 	}
 
@@ -95,12 +95,10 @@ export abstract class Element {
 	public abstract render(): void;
 
 	protected drawPath2d = () => {
-		const path2d = new Path2D()
+		const path2d = new Path2D();
 		const { currentPaths } = this;
 		path2d.moveTo(...currentPaths[0]);
-		for (let i = 1; i < currentPaths.length; i++) {
-			path2d.lineTo(...currentPaths[i]);
-		}
+		for (let i = 1; i < currentPaths.length; i++) path2d.lineTo(...currentPaths[i]);
 		path2d.closePath();
 		return path2d;
 	}
@@ -110,4 +108,6 @@ export abstract class Element {
 	protected abstract restore(): void;
 
 	protected abstract changeState(): void;
+
+	protected abstract stretchBack(): void;
 }

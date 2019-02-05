@@ -1,8 +1,10 @@
 import { Element } from './element';
 import { Color } from './color';
 import { RenderElement } from 'lib/render';
+import { abVector, countCenterPos, distanceAB } from 'lib/utils';
+import { Sepatater } from './separate';
 
-export enum DrawMode { fill = 1, stroke };
+export enum DrawMode { fill = 1, stroke, both };
 
 export class GraphicsElement extends Element implements RenderElement {
 	private isChange = true;
@@ -52,6 +54,13 @@ export class GraphicsElement extends Element implements RenderElement {
 		}
 		this.restore();
 	}
+
+	public stretchBack = () => {
+		const { originPaths, centerPoint } = this;
+		const originCenterPoint = countCenterPos(originPaths);
+		const vector = abVector(centerPoint, originCenterPoint);
+		Sepatater.getInstance().addElement(this, vector, distanceAB(centerPoint, originCenterPoint));
+	};
 
 	protected changeState = () => {
 		if (!this.isChange) this.isChange = true;
