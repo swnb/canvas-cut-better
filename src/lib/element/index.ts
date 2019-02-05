@@ -1,2 +1,4 @@
-export { Handler } from "./handler";
-export { BaseElement } from './base';
+export { GraphicsElement, createGraphicsElement, DrawMode } from "./graphics-element";
+export { Element } from './element';
+export { Sepatater } from './separate';
+export { Color } from './color';
