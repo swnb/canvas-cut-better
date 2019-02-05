@@ -28,3 +28,15 @@ export const findPointInsideLineSegment = (points: Pos[], [startPoint, endPoint]
 	}
 	return null;
 }
+
+export const reduceVectorSize = ([x, y]: Vector, size: number): Vector => {
+	const distance = Math.sqrt((x ** 2) + (y ** 2))
+	return [x * size / distance, y * size / distance];
+}
+
+export const countSepatateVector = (centerPoint: Pos, [startPoint, endPoint]: LineSegment): Vector => {
+	const segmentLength1 = distanceAB(startPoint, centerPoint);
+	const segmentLength2 = distanceAB(centerPoint, endPoint);
+	const ratio = segmentLength1 / (segmentLength1 + segmentLength2)
+	return abVector([(endPoint[0] - startPoint[0]) * ratio + startPoint[0], (endPoint[1] - startPoint[1]) * ratio + startPoint[1]], centerPoint);
+}

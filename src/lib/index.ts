@@ -1,10 +1,8 @@
 import { Render } from './render';
-import { Handler, BaseElement } from './element';
-import { abVector, countDeg } from './utils';
+import { createGraphicsElement, Element, Sepatater, Color, DrawMode } from './element';
+import { abVector, countDeg, countSepatateVector } from './utils';
 import { Rotater } from './rotater';
 import { Wire } from './wire';
-import { getIntersections, Sepatater } from './cutter';
-import { Color } from './element/color';
 
 enum OprateMode { move = 1, rotate, cut, none };
 
@@ -15,7 +13,7 @@ export class CanvasCut {
 	private wire: Wire;
 	private sepatater: Sepatater;
 	private currenOprateMode: OprateMode = OprateMode.cut;
-	private currentSelectedElement: BaseElement | null = null;
+	private currentSelectedElement: Element | null = null;
 
 	constructor(context: CanvasRenderingContext2D, render: Render, rotater: Rotater, wire: Wire, sepatater: Sepatater) {
 		this.context = context;
@@ -26,8 +24,7 @@ export class CanvasCut {
 	}
 
 	public createElement = (paths: Paths) => {
-		const ele = new Handler(paths);
-		ele.attachContext(this.context);
+		const ele = createGraphicsElement(this.context, paths);
 		this.render.registRender(ele);
 		return ele;
 	}
@@ -110,6 +107,7 @@ export class CanvasCut {
 
 	private rotateElement = (prePos: Pos, currentPos: Pos) => {
 		if (!this.currentSelectedElement) return;
+
 		const { currentSelectedElement } = this;
 		const originPos = currentSelectedElement.getCenterPiont();
 		const [cosDeg, sinDeg] = countDeg(originPos, prePos, currentPos);
@@ -117,25 +115,30 @@ export class CanvasCut {
 	}
 
 	private searchCutElement = () => {
-		const result: Handler[] = [];
 		window.console.time("search")
 		const lineSegment = this.wire.getLineSegment();
 		for (const element of this.render.allElements()) {
-			const intersections = getIntersections(element, lineSegment)
+			const intersections = element.getIntersections(lineSegment);
 			if (!intersections) continue;
 			// cut element;
 			const twoPaths = element.cut(intersections);
 			if (!twoPaths) continue;
 			this.render.remove(element);
 			for (const paths of twoPaths) {
-				const e = this.createElement(paths);
-				this.sepatater.addElement(e, intersections);
-				e.setColor(new Color(25, 100, 255));
+				this.createChildElement(paths, intersections);
 			}
 		}
 		window.console.timeEnd("search");
-		return result;
 	}
+
+	private createChildElement = (paths: Paths, intersections: LineSegment) => {
+		const e = this.createElement(paths);
+		const sepatateVector = countSepatateVector(e.getCenterPiont(), intersections);
+		this.sepatater.addElement(e, sepatateVector);
+		e.setColor(new Color(255, 100, 20));
+		e.setDrawMode(DrawMode.fill);
+		setTimeout(e.stretchBack, 3000);
+	};
 }
 
 export const attachContext = (canvas: HTMLCanvasElement) => {
@@ -152,7 +155,7 @@ export const attachContext = (canvas: HTMLCanvasElement) => {
 	const wire = new Wire(context);
 	render.push(wire.render);
 	// sepatater
-	const sepatater = new Sepatater();
-	render.unshift(sepatater.render);
+	const sepatater = Sepatater.getInstance();
+	render.push(sepatater.render);
 	return new CanvasCut(context, render, rotater, wire, sepatater);
 }

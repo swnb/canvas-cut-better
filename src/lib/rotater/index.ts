@@ -1,11 +1,16 @@
 import { RenderElement } from 'lib/render';
-import { Color } from '../element/color';
-import { affineTransformation, isSamePos, } from 'lib/utils';
-import { BaseElement } from '../element/base';
+import { affineTransformation, abVector, abPlus } from 'lib/utils';
+import { Element, Color } from 'lib/element';
 
 interface Options {
 	color?: Color
+}
 
+interface Snapshot {
+	relPos: Pos;
+	preCenterPos: Pos;
+	getTotalCosSinDeg(): [number, number];
+	getCenterPiont(): Pos;
 }
 
 export class Rotater implements RenderElement {
@@ -13,9 +18,9 @@ export class Rotater implements RenderElement {
 
 	private context: CanvasRenderingContext2D;
 	private color: Color;
-	private preElementPoint: Pos = [Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER];
 	private path2d: Path2D = new Path2D();
-	private bindedElement: BaseElement | null = null;
+	private bindedElement: Element | null = null;
+	private cacheElementSnapshot: Map<symbol, Snapshot> = new Map();
 
 	constructor(context: CanvasRenderingContext2D, options: Options = {}) {
 		this.context = context
@@ -25,13 +30,9 @@ export class Rotater implements RenderElement {
 	public render = () => {
 		if (!this.bindedElement) return;
 
-		const { bindedElement } = this;
-		if (this.isBindedElementChange(bindedElement)) {
-			this.setNewPath2d(bindedElement);
-		}
-
+		this.drawPath2d();
 		const preDrawStyle = this.context.fillStyle;
-		this.context.fillStyle = this.color.getColor();
+		this.context.fillStyle = this.color.string;
 		this.context.fill(this.path2d);
 		this.context.fillStyle = preDrawStyle;
 	}
@@ -40,38 +41,49 @@ export class Rotater implements RenderElement {
 		this.bindedElement = null;
 	}
 
-	public bindElement = (element: BaseElement) => {
+	public bindElement = (element: Element) => {
 		if (this.bindedElement && this.bindedElement === element) return;
 
+		const { cacheElementSnapshot } = this;
+		const { key } = element;
+		if (!cacheElementSnapshot.has(key)) {
+			const { getRelPos } = this;
+			const { getCenterPiont, getTotalCosSinDeg } = element;
+			cacheElementSnapshot.set(key, {
+				relPos: getRelPos(element),
+				preCenterPos: getCenterPiont(),
+				getTotalCosSinDeg,
+				getCenterPiont,
+			});
+		}
 		this.bindedElement = element;
-		this.recordElement(element);
-		this.setNewPath2d(element);
 	}
 
 	public isPointInside = (point: Pos) => this.context.isPointInPath(this.path2d, ...point);
 
-	private recordElement = (element: BaseElement) => {
-		this.preElementPoint = element.getPaths()[0];
+	private drawPath2d = () => {
+		const snapshot = this.cacheElementSnapshot.get((this.bindedElement as Element).key) as Snapshot;
+		const { getTotalCosSinDeg, relPos, preCenterPos, getCenterPiont } = snapshot;
+		const [cosDeg, sinDeg] = getTotalCosSinDeg();
+		const centerPoint = getCenterPiont();
+		const nextRelPos = abPlus(relPos, abVector(preCenterPos, centerPoint))
+		const point = affineTransformation(cosDeg, sinDeg, nextRelPos, centerPoint);
+		this.createNewPath2d(point);
 	}
 
-	private isBindedElementChange = (element: BaseElement) => !isSamePos(this.preElementPoint, element.getPaths()[0]);
-
-	// TODO  better implement
-	private relPos = ([x, y]: Pos): Pos => [x, y - 30];
-
-	private drawPos = ([x, y]: Pos) => {
-		const path2d = new Path2D();
-		// TODO implement rotater here;
-		path2d.arc(x, y, 10, 0, 2 * Math.PI)
-		return path2d;
-	}
-
-	private setNewPath2d = (element: BaseElement) => {
-		const [cosDeg, sinDeg] = element.getTotalCosSinDeg();
+	private getRelPos = (element: Element): Pos => {
 		const originPos = element.getCenterPiont();
-		const point = affineTransformation(cosDeg, sinDeg, this.relPos(originPos), originPos);
-		this.path2d = this.drawPos(point);
-		this.recordElement(element);
+		let minY = Number.MAX_SAFE_INTEGER;
+		for (const [, y] of element.getPaths()) {
+			if (y < minY) minY = y;
+		}
+		return [originPos[0], minY - 30];
+	}
+
+	private createNewPath2d = ([x, y]: Pos) => {
+		const path2d = new Path2D();
+		path2d.arc(x, y, 10, 0, 2 * Math.PI)
+		this.path2d = path2d;
 	}
 }
 
