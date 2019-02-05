@@ -156,6 +156,6 @@ export const attachContext = (canvas: HTMLCanvasElement) => {
 	render.push(wire.render);
 	// sepatater
 	const sepatater = Sepatater.getInstance();
-	render.unshift(sepatater.render);
+	render.push(sepatater.render);
 	return new CanvasCut(context, render, rotater, wire, sepatater);
 }
