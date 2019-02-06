@@ -1,0 +1,35 @@
+language: node_js
+
+git:
+  quiet: true
+  submodules: false
+  depth: 1
+
+branches:
+  only:
+    - master
+
+[skip cosmetic]: cosmetic code
+
+cache:
+  yarn: true
+
+matrix:
+  include:
+    - name: build-project
+      node_js: '11.4.0'
+      env: NODE_PATH=./src closeBundleAnalyz=true
+
+# deploy content to gh-pages
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $GITHUB_TOKEN
+  keep-history: true
+  local-dir: ./build/
+  on:
+    branch: master
+
+install: yarn
+
+script: yarn build

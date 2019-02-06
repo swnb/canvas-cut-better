@@ -36,7 +36,7 @@ module.exports = function override(config, env) {
 
 	config = rewireReactHotLoader(config, env);
 
-	if (env === 'production') {
+	if (env === 'production' && !process.env['closeBundleAnalyz']) {
 		if (!config.plugins) {
 			config.plugins = [];
 		}
