@@ -1,11 +1,12 @@
-import { affineTransformation, linearMove, countCenterPos, createSamples } from 'lib/utils';
+import { affineTransformation, linearMove, countCenterPos } from 'lib/utils';
 import { totalDegPlus } from 'lib/utils';
 import { cut } from 'lib/element/cut';
+import { getIntersections } from './cut-dev';
 
 export abstract class Element {
-	public key = Symbol();
 
 	public get locked() { return this.isLocked; }
+	public key = Symbol();
 
 	protected centerPoint: Pos;
 	protected originPaths: Paths;
@@ -26,49 +27,6 @@ export abstract class Element {
 	public getPaths = () => [...this.currentPaths] as Paths;
 
 	public getTotalCosSinDeg = () => [...this.totalCosSinDeg] as [number, number];
-
-	// getIntersections use dichotomies to find the intersection points;
-	public getIntersections = (lineSegment: LineSegment): null | [Pos, Pos] => {
-		const { isPointInside } = this;
-		const samples = createSamples(lineSegment, 20);
-		let intersectionInterval1: LineSegment | undefined;
-		let intersectionInterval2: LineSegment | undefined;
-		let searchFirstIntersection1 = true;
-		for (let i = 1; i < samples.length; i++) {
-			const pos = samples[i];
-			if (searchFirstIntersection1) {
-				if (isPointInside(pos)) {
-					intersectionInterval1 = [samples[i - 1], pos];
-					// change search mode to search second intersection
-					searchFirstIntersection1 = false;
-				}
-			} else {
-				if (!isPointInside(pos)) {
-					intersectionInterval2 = [samples[i - 1], pos];
-					// when secon is found break all;
-					break;
-				}
-			}
-		}
-		if (!intersectionInterval1 || !intersectionInterval2) return null;
-
-		let firstIntersection: Pos = intersectionInterval1[0];
-		for (const pos of createSamples(intersectionInterval1, 1)) {
-			if (isPointInside(pos)) {
-				firstIntersection = pos;
-				break
-			}
-		}
-
-		let secondIntersection: Pos = intersectionInterval2[0];
-		for (const pos of createSamples(intersectionInterval2, 1)) {
-			if (!isPointInside(pos)) {
-				secondIntersection = pos;
-				break
-			}
-		}
-		return [firstIntersection, secondIntersection];
-	}
 
 	public lock = () => {
 		if (!this.isLocked) this.isLocked = true;
@@ -100,8 +58,13 @@ export abstract class Element {
 		this.changeState();
 	}
 
-	public cut = (intersections: LineSegment): [Paths, Paths] | null => {
-		return this.isLocked ? null : cut(this.currentPaths, intersections);
+	public cut = (lineSegment: LineSegment): Paths[] | null => {
+		if (this.isLocked) return null;
+
+		const intersections = this.getIntersections(lineSegment);
+		if (!intersections) return null;
+
+		return cut(this.currentPaths, intersections);
 	}
 
 	public record = () => {
@@ -124,4 +87,9 @@ export abstract class Element {
 	protected abstract changeState(): void;
 
 	protected abstract stretchBack(): void;
+
+	// getIntersections use dichotomies to find the intersection points;
+	private getIntersections = (lineSegment: LineSegment): null | Pos[] => {
+		return getIntersections(this.isPointInside, lineSegment);
+	}
 }

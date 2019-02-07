@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { attachContext, CanvasCut } from 'lib';
-import { GraphicsPaths } from 'lib/element/type';
+import { attachCanvas, CanvasCut } from 'lib';
+import { Irregular, IrregularType, Circle, CircleType } from 'lib/species';
 
 type ReactEvent = React.PointerEvent<HTMLCanvasElement>;
 
@@ -18,11 +18,14 @@ export class CanvasCutComponent extends React.PureComponent {
 
 	public componentDidMount = () => {
 		this.setSize();
-		const canvas = (this.ref.current as HTMLCanvasElement) as HTMLCanvasElement;
-		this.cc = attachContext(canvas);
-		for (let i = 0; i < 10; i++) {
-			this.cc.createElement(GraphicsPaths.Irregular[0]);
-		}
+
+		const canvas = this.ref.current as HTMLCanvasElement;
+		const canvasCut = attachCanvas(canvas);
+
+		canvasCut.createElement(Irregular(IrregularType.Irregular3));
+		canvasCut.rmElement(canvasCut.createElement(Circle(CircleType.Circle1)));
+
+		this.cc = canvasCut;
 		window.addEventListener('resize', this.setSize);
 	};
 
