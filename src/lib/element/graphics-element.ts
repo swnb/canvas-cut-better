@@ -13,8 +13,8 @@ export class GraphicsElement extends Element implements RenderElement {
 	private context: CanvasRenderingContext2D;
 	private path2d = new Path2D();
 
-	constructor(context: CanvasRenderingContext2D, paths: Pos[]) {
-		super(paths);
+	constructor(context: CanvasRenderingContext2D, initPaths: Paths) {
+		super(initPaths);
 		this.context = context;
 	}
 
