@@ -103,10 +103,6 @@ export abstract class Element {
 		return path2d;
 	}
 
-	protected abstract save(): void;
-
-	protected abstract restore(): void;
-
 	protected abstract changeState(): void;
 
 	protected abstract stretchBack(): void;

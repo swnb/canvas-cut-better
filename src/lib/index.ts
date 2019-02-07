@@ -1,5 +1,5 @@
 import { Render } from './render';
-import { createGraphicsElement, Element, Sepatater, Color, DrawMode } from './element';
+import { createGraphicsElement, Element, Sepatater, Color } from './element';
 import { abVector, countDeg, countSepatateVector } from './utils';
 import { Rotater } from './rotater';
 import { Wire } from './wire';
@@ -135,8 +135,7 @@ export class CanvasCut {
 		const e = this.createElement(paths);
 		const sepatateVector = countSepatateVector(e.getCenterPiont(), intersections);
 		this.sepatater.addElement(e, sepatateVector);
-		e.setColor(new Color(255, 100, 20));
-		e.setDrawMode(DrawMode.fill);
+		e.setColor(new Color(252, 185, 65, 1));
 		setTimeout(e.stretchBack, 3000);
 	};
 }
