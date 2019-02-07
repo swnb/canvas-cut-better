@@ -1,7 +1,5 @@
 import { affineTransformation, linearMove, countCenterPos } from 'lib/utils';
 import { totalDegPlus } from 'lib/utils';
-import { cut } from 'lib/element/cut';
-import { getIntersections } from './cut-dev';
 
 export abstract class Element {
 
@@ -58,15 +56,6 @@ export abstract class Element {
 		this.changeState();
 	}
 
-	public cut = (lineSegment: LineSegment): Paths[] | null => {
-		if (this.isLocked) return null;
-
-		const intersections = this.getIntersections(lineSegment);
-		if (!intersections) return null;
-
-		return cut(this.currentPaths, intersections);
-	}
-
 	public record = () => {
 		this.recordPathsQueue.push([...this.currentPaths]);
 	}
@@ -87,9 +76,4 @@ export abstract class Element {
 	protected abstract changeState(): void;
 
 	protected abstract stretchBack(): void;
-
-	// getIntersections use dichotomies to find the intersection points;
-	private getIntersections = (lineSegment: LineSegment): null | Pos[] => {
-		return getIntersections(this.isPointInside, lineSegment);
-	}
 }

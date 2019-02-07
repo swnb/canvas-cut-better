@@ -3,6 +3,7 @@ import { createGraphicsElement, Element, Sepatater, GraphicsElement } from './el
 import { abVector, countDeg } from './utils';
 import { Rotater } from './rotater';
 import { Wire } from './wire';
+import { Cutter } from './cutter';
 
 enum OprateMode { move = 1, rotate, cut, none };
 
@@ -11,15 +12,17 @@ export class CanvasCut {
 	private render: Render
 	private rotater: Rotater;
 	private wire: Wire;
+	private cutter: Cutter;
 	private sepatater: Sepatater;
 	private currenOprateMode: OprateMode = OprateMode.cut;
 	private currentSelectedElement: Element | null = null;
 
-	constructor(context: CanvasRenderingContext2D, render: Render, rotater: Rotater, wire: Wire, sepatater: Sepatater) {
+	constructor(context: CanvasRenderingContext2D, render: Render, rotater: Rotater, wire: Wire, cutter: Cutter, sepatater: Sepatater) {
 		this.context = context;
 		this.render = render;
 		this.rotater = rotater;
 		this.wire = wire;
+		this.cutter = cutter;
 		this.sepatater = sepatater;
 	}
 
@@ -119,14 +122,16 @@ export class CanvasCut {
 
 	private searchCutElement = () => {
 		window.console.time("search")
-		const lineSegment = this.wire.getLineSegment();
+		const { cutter, wire } = this;
+		const lineSegment = wire.getLineSegment();
+		cutter.setCutLine(lineSegment);
 		for (const element of this.render.allElements()) {
 			// cut element;
-			const paths = element.cut(lineSegment);
-			if (!paths) continue;
+			const childrenPaths = cutter.cutElement(element);
+			if (!childrenPaths) continue;
 
 			this.render.remove(element);
-			for (const path of paths) {
+			for (const path of childrenPaths) {
 				this.createElement(path);
 			}
 		}
@@ -157,5 +162,7 @@ export const attachCanvas = (canvas: HTMLCanvasElement) => {
 	// sepatater
 	const sepatater = Sepatater.getInstance();
 	render.push(sepatater.render);
-	return new CanvasCut(context, render, rotater, wire, sepatater);
+	// cutter 
+	const cutter = new Cutter();
+	return new CanvasCut(context, render, rotater, wire, cutter, sepatater);
 }
