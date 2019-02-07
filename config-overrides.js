@@ -43,5 +43,9 @@ module.exports = function override(config, env) {
 		config.plugins.push(new BundleAnalyzerPlugin({ generateStatsFile: true }));
 	}
 
+	if (env === 'production') {
+		config.devtool = '';
+	}
+
 	return config;
 };
