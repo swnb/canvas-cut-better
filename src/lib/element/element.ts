@@ -5,11 +5,15 @@ import { cut } from 'lib/element/cut';
 export abstract class Element {
 	public key = Symbol();
 
+	public get locked() { return this.isLocked; }
+
 	protected centerPoint: Pos;
 	protected originPaths: Paths;
 	protected recordPathsQueue: Paths[] = [];
 	protected currentPaths: Paths;
 	protected totalCosSinDeg: [number, number] = [1, 0];
+
+	private isLocked = false;
 
 	constructor(paths: Pos[]) {
 		this.centerPoint = countCenterPos(paths)
@@ -66,7 +70,17 @@ export abstract class Element {
 		return [firstIntersection, secondIntersection];
 	}
 
+	public lock = () => {
+		if (!this.isLocked) this.isLocked = true;
+	}
+
+	public unLock = () => {
+		if (this.isLocked) this.isLocked = false;
+	}
+
 	public move = (vector: Pos) => {
+		if (this.isLocked) return;
+
 		const { centerPoint, currentPaths } = this;
 		for (let i = 0; i < currentPaths.length; i++) {
 			currentPaths[i] = linearMove(currentPaths[i], vector)
@@ -76,6 +90,8 @@ export abstract class Element {
 	}
 
 	public rotate = (cosDeg: number, sinDeg: number) => {
+		if (this.isLocked) return;
+
 		const { currentPaths } = this;
 		for (let i = 0; i < currentPaths.length; i++) {
 			currentPaths[i] = affineTransformation(cosDeg, sinDeg, currentPaths[i], this.centerPoint)
@@ -84,7 +100,9 @@ export abstract class Element {
 		this.changeState();
 	}
 
-	public cut = (intersections: LineSegment): [Paths, Paths] | null => cut(this.currentPaths, intersections);
+	public cut = (intersections: LineSegment): [Paths, Paths] | null => {
+		return this.isLocked ? null : cut(this.currentPaths, intersections);
+	}
 
 	public record = () => {
 		this.recordPathsQueue.push([...this.currentPaths]);

@@ -72,7 +72,6 @@ export class CanvasCut {
 		this.wire.destory();
 		this.sepatater.clear();
 		this.render.clear();
-
 	}
 
 	private selectElement = (pos: Pos) => {
@@ -135,7 +134,7 @@ export class CanvasCut {
 		const e = this.createElement(paths);
 		const sepatateVector = countSepatateVector(e.getCenterPiont(), intersections);
 		this.sepatater.addElement(e, sepatateVector);
-		e.setColor(new Color(252, 185, 65, 1));
+		e.setColor(new Color(248, 148, 6, 1));
 		setTimeout(e.stretchBack, 3000);
 	};
 }
