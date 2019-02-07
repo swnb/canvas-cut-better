@@ -1,6 +1,6 @@
 import { Render } from './render';
-import { createGraphicsElement, Element, Sepatater, Color, DrawMode } from './element';
-import { abVector, countDeg, countSepatateVector } from './utils';
+import { createGraphicsElement, Element, Sepatater, GraphicsElement } from './element';
+import { abVector, countDeg } from './utils';
 import { Rotater } from './rotater';
 import { Wire } from './wire';
 
@@ -27,6 +27,10 @@ export class CanvasCut {
 		const ele = createGraphicsElement(this.context, paths);
 		this.render.registRender(ele);
 		return ele;
+	}
+
+	public rmElement = (element: GraphicsElement) => {
+		this.render.remove(element);
 	}
 
 	public startAnimation = () => {
@@ -72,7 +76,6 @@ export class CanvasCut {
 		this.wire.destory();
 		this.sepatater.clear();
 		this.render.clear();
-
 	}
 
 	private selectElement = (pos: Pos) => {
@@ -118,30 +121,27 @@ export class CanvasCut {
 		window.console.time("search")
 		const lineSegment = this.wire.getLineSegment();
 		for (const element of this.render.allElements()) {
-			const intersections = element.getIntersections(lineSegment);
-			if (!intersections) continue;
 			// cut element;
-			const twoPaths = element.cut(intersections);
-			if (!twoPaths) continue;
+			const paths = element.cut(lineSegment);
+			if (!paths) continue;
+
 			this.render.remove(element);
-			for (const paths of twoPaths) {
-				this.createChildElement(paths, intersections);
+			for (const path of paths) {
+				this.createElement(path);
 			}
 		}
 		window.console.timeEnd("search");
 	}
 
-	private createChildElement = (paths: Paths, intersections: LineSegment) => {
-		const e = this.createElement(paths);
-		const sepatateVector = countSepatateVector(e.getCenterPiont(), intersections);
-		this.sepatater.addElement(e, sepatateVector);
-		e.setColor(new Color(255, 100, 20));
-		e.setDrawMode(DrawMode.fill);
-		setTimeout(e.stretchBack, 3000);
-	};
+	// private createChildElement = (paths: Paths) => {
+	// const e = this.createElement(paths);
+	// const sepatateVector = countSepatateVector(e.getCenterPiont(), intersections);
+	// this.sepatater.addElement(e, sepatateVector);
+	// e.setColor(new Color(248, 148, 6, 1));
+	// };
 }
 
-export const attachContext = (canvas: HTMLCanvasElement) => {
+export const attachCanvas = (canvas: HTMLCanvasElement) => {
 	const context = canvas.getContext('2d')
 	if (!context) throw Error(`can't get context from html dom canvas => ${canvas}`);
 	// render

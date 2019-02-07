@@ -4,14 +4,12 @@ import { RenderElement } from 'lib/render';
 import { abVector, countCenterPos, distanceAB } from 'lib/utils';
 import { Sepatater } from './separate';
 
-export enum DrawMode { fill = 1, stroke, both };
-
 export class GraphicsElement extends Element implements RenderElement {
 	private isChange = true;
 
-	private drawMode: DrawMode = DrawMode.fill;
-	private color: Color = new Color(107, 185, 240);
-	private preDrawStyle: string | CanvasGradient | CanvasPattern = "";
+	private color: Color = new Color(228, 241, 254, 1);
+	private borderWidth: number = 1;
+	private borderColor: Color = new Color(44, 130, 201, 1);
 	private context: CanvasRenderingContext2D;
 	private path2d = new Path2D();
 
@@ -24,16 +22,18 @@ export class GraphicsElement extends Element implements RenderElement {
 		this.color = color
 	}
 
-	public setDrawMode = (mode: DrawMode) => {
-		this.drawMode = mode
+	public setBorder = (width: number, color: Color) => {
+		this.borderWidth = width;
+		this.borderColor = color;
 	}
 
 	public isPointInside = (point: Pos) => this.context.isPointInPath(this.path2d, ...point)
 
 	public render = () => {
-		const { context, color, drawMode } = this;
+		const { context, } = this;
 		if (!context) return;
 
+		const { color, borderWidth, borderColor, } = this;
 		// path2d will reclare when element is change
 		if (this.isChange) {
 			this.path2d = this.drawPath2d();
@@ -41,18 +41,11 @@ export class GraphicsElement extends Element implements RenderElement {
 		}
 		const { path2d } = this;
 
-		this.save();
-		switch (drawMode) {
-			case DrawMode.fill:
-				context.fillStyle = color.string;
-				context.fill(path2d);
-				break;
-			case DrawMode.stroke:
-				context.strokeStyle = color.string;
-				context.stroke(path2d);
-				break;
-		}
-		this.restore();
+		context.lineWidth = borderWidth;
+		context.strokeStyle = borderColor.string;
+		context.fillStyle = color.string;
+		context.fill(path2d);
+		context.stroke(path2d);
 	}
 
 	public stretchBack = () => {
@@ -64,28 +57,6 @@ export class GraphicsElement extends Element implements RenderElement {
 
 	protected changeState = () => {
 		if (!this.isChange) this.isChange = true;
-	}
-
-	protected save = () => {
-		switch (this.drawMode) {
-			case DrawMode.fill:
-				this.preDrawStyle = this.context.fillStyle;
-				break;
-			case DrawMode.stroke:
-				this.preDrawStyle = this.context.strokeStyle;
-				break;
-		}
-	}
-
-	protected restore = () => {
-		switch (this.drawMode) {
-			case DrawMode.fill:
-				this.context.fillStyle = this.preDrawStyle;
-				break;
-			case DrawMode.stroke:
-				this.context.strokeStyle = this.preDrawStyle;
-				break;
-		}
 	}
 }
 

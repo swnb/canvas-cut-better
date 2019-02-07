@@ -13,12 +13,6 @@ export const createSamples = ([a, b]: LineSegment, step: number) => {
 	return samples;
 }
 
-export const isPointInsideLineSegment = (point: Pos, [startPoint, endPoint]: LineSegment) => {
-	const segment1 = distanceAB(startPoint, point);
-	const segment2 = distanceAB(point, endPoint);
-	return Math.abs((segment1 + segment2) - distanceAB(startPoint, endPoint)) <= 0.1
-}
-
 export const findPointInsideLineSegment = (points: Pos[], [startPoint, endPoint]: LineSegment): null | Pos => {
 	const length = distanceAB(startPoint, endPoint);
 	for (const point of points) {
