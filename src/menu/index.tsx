@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as Styles from './style.module.css';
+import Items from './items';
 
 const { useState } = React;
 
@@ -27,7 +28,7 @@ export const Menu = () => {
 			<div className={Styles.button} onClick={toggleShow}>
 				<div className={isShow ? Styles.iconShow : Styles.iconHide} />
 			</div>
-			<div className={Styles.menu} />
+			<div className={Styles.menu}>{<Items />}</div>
 		</div>
 	);
 };

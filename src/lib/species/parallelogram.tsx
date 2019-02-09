@@ -1,15 +1,14 @@
 import { base, sqrt2 } from './base-var';
 
 export enum Type {
-	Parallelogram1 = 1,
-	Parallelogram2,
-	Parallelogram3
+	t1 = 1,
+	t2,
+	t3
 }
 
-export const Parallelogram = (type: Type): Paths => {
-	const { size: baseSize } = base;
+export const create = (type: Type, baseSize = base.size): Paths => {
 	switch (type) {
-		case Type.Parallelogram1: {
+		case Type.t1: {
 			return [
 				[baseSize, 0],
 				[baseSize * 2, 0],
@@ -17,7 +16,7 @@ export const Parallelogram = (type: Type): Paths => {
 				[0, baseSize]
 			];
 		}
-		case Type.Parallelogram2: {
+		case Type.t2: {
 			return [
 				[0, 0],
 				[baseSize * sqrt2, 0],
@@ -25,7 +24,7 @@ export const Parallelogram = (type: Type): Paths => {
 				[0, baseSize * sqrt2]
 			];
 		}
-		case Type.Parallelogram3: {
+		case Type.t3: {
 			return [
 				[0, 0],
 				[(baseSize * 2) / 3, 0],

@@ -1,5 +1,7 @@
+import * as Triangle from './triangle';
+import * as Circle from './circle';
+import * as  Parallelogram from './parallelogram';
+import * as  Irregular from './irregular';
+
 export { base } from './base-var';
-export { Triangle, Type as TriangleType } from './triangle';
-export { Irregular, Type as IrregularType } from './irregular';
-export { Circle, Type as CircleType } from './circle';
-export { Parallelogram, Type as ParallelogramType } from './parallelogram';
+export { Triangle, Irregular, Circle, Parallelogram }
