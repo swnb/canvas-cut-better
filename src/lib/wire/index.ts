@@ -22,6 +22,7 @@ export class Wire implements RenderElement {
 
 	constructor(context: CanvasRenderingContext2D) {
 		this.context = context;
+		// TODO make this config better
 		this.wireContextConfig = {
 			lineWidth: 3,
 			lineCap: 'round',
