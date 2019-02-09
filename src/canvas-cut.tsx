@@ -1,6 +1,14 @@
 import * as React from 'react';
 import { attachCanvas, CanvasCut } from 'lib';
-import { Irregular, IrregularType, Circle, CircleType } from 'lib/species';
+import {
+	Irregular,
+	IrregularType,
+	Triangle,
+	TriangleType,
+	Parallelogram,
+	ParallelogramType
+} from 'lib/species';
+import { randomMove } from 'lib/tag/random';
 
 type ReactEvent = React.PointerEvent<HTMLCanvasElement>;
 
@@ -21,10 +29,21 @@ export class CanvasCutComponent extends React.PureComponent {
 
 		const canvas = this.ref.current as HTMLCanvasElement;
 		const canvasCut = attachCanvas(canvas);
-
-		canvasCut.createElement(Irregular(IrregularType.Irregular3));
-		canvasCut.rmElement(canvasCut.createElement(Circle(CircleType.Circle1)));
-
+		randomMove(canvasCut.createElement(Triangle(TriangleType.Triangle1)));
+		randomMove(canvasCut.createElement(Triangle(TriangleType.Triangle2)));
+		randomMove(canvasCut.createElement(Triangle(TriangleType.Triangle3)));
+		randomMove(canvasCut.createElement(Irregular(IrregularType.Irregular1)));
+		randomMove(canvasCut.createElement(Irregular(IrregularType.Irregular2)));
+		randomMove(canvasCut.createElement(Irregular(IrregularType.Irregular3)));
+		randomMove(
+			canvasCut.createElement(Parallelogram(ParallelogramType.Parallelogram1))
+		);
+		randomMove(
+			canvasCut.createElement(Parallelogram(ParallelogramType.Parallelogram2))
+		);
+		randomMove(
+			canvasCut.createElement(Parallelogram(ParallelogramType.Parallelogram3))
+		);
 		this.cc = canvasCut;
 		window.addEventListener('resize', this.setSize);
 	};
