@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { Triangle, Parallelogram, Irregular } from 'lib/species';
-import { path2clipPath } from 'lib/species/parse';
+import { Triangle, Parallelogram, Irregular, path2clipPath } from 'lib/species';
+import * as Styles from './items.module.css';
 
 const GraphSpecies = {
 	Triangle,
@@ -8,12 +8,14 @@ const GraphSpecies = {
 	Parallelogram
 };
 
-export default () => {
-	return (
-		<>
-			{Object.values(GraphSpecies).map(({ create, Type: { tP } }, index) => {
-				return <div key={index}>{path2clipPath(create(tP))}</div>;
-			})}
-		</>
-	);
-};
+export default () => (
+	<div className={Styles.container}>
+		{Object.values(GraphSpecies).map(({ create, Type: { tP } }, index) => (
+			<div
+				className={Styles.item}
+				key={index}
+				style={{ clipPath: path2clipPath(create(tP)) }}
+			/>
+		))}
+	</div>
+);

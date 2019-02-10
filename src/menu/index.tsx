@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as Styles from './style.module.css';
+import * as Styles from './index.module.css';
 import Items from './items';
 
 const { useState } = React;

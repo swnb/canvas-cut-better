@@ -4,4 +4,5 @@ import * as  Parallelogram from './parallelogram';
 import * as  Irregular from './irregular';
 
 export { base } from './base-var';
+export { path2clipPath } from './parse';
 export { Triangle, Irregular, Circle, Parallelogram };

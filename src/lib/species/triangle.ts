@@ -33,7 +33,7 @@ export const create = (type: Type, baseSize = base.size): Path => {
 		case Type.tP: {
 			return [
 				[0.5, 0],
-				[1, 0],
+				[1, 1],
 				[0, 1]
 			];
 		}
