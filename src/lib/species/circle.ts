@@ -7,9 +7,9 @@ export enum Type {
 }
 
 const n = 100;
-export const Circle = (type: Type): Paths => {
+export const Circle = (type: Type): Path => {
 	const { size: baseSize } = base;
-	const paths: Paths = [[200, -baseSize / 2]];
+	const paths: Path = [[200, -baseSize / 2]];
 	const deg = 2 * Math.PI / n;
 	for (let i = 1; i < 99; i++) {
 		paths[i] = affineTransformation(Math.cos(deg), Math.sin(deg), paths[i - 1], [200, 200]);
