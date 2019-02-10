@@ -1,8 +1,7 @@
 import * as Triangle from './triangle';
-import * as Circle from './circle';
+// import * as Circle from './circle';
 import * as  Parallelogram from './parallelogram';
 import * as  Irregular from './irregular';
 
-export { base } from './base-var';
 export { path2clipPath } from './parse';
-export { Triangle, Irregular, Circle, Parallelogram };
+export { Triangle, Irregular, Parallelogram };
