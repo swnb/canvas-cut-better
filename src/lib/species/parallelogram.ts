@@ -3,10 +3,11 @@ import { base, sqrt2 } from './base-var';
 export enum Type {
 	t1 = 1,
 	t2,
-	t3
+	t3,
+	tP
 }
 
-export const create = (type: Type, baseSize = base.size): Paths => {
+export const create = (type: Type, baseSize = base.size): Path => {
 	switch (type) {
 		case Type.t1: {
 			return [
@@ -30,6 +31,14 @@ export const create = (type: Type, baseSize = base.size): Paths => {
 				[(baseSize * 2) / 3, 0],
 				[(baseSize * 2) / 3, (baseSize * 3) / 2],
 				[0, (baseSize * 3) / 2]
+			];
+		}
+		case Type.tP: {
+			return [
+				[0.5, 0],
+				[1, 0],
+				[0.5, 1],
+				[0, 1]
 			];
 		}
 	}

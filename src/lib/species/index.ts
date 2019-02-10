@@ -4,4 +4,4 @@ import * as  Parallelogram from './parallelogram';
 import * as  Irregular from './irregular';
 
 export { base } from './base-var';
-export { Triangle, Irregular, Circle, Parallelogram }
+export { Triangle, Irregular, Circle, Parallelogram };
