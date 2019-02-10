@@ -59,8 +59,8 @@ export class Wire implements RenderElement {
 	public getLineSegment = (): LineSegment => [this.fixedPoint, this.movingPoint];
 
 	public destory = () => {
-		this.fixedPoint = [0, 0];
-		this.movingPoint = [0, 0];
+		this.fixedPoint = [-100, -100];
+		this.movingPoint = [-100, -100];
 		this.changeState();
 	}
 
