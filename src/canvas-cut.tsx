@@ -3,6 +3,8 @@ import { attachCanvas, CanvasCut } from 'lib';
 import { Irregular, Triangle, Parallelogram } from 'lib/species';
 import { randomMove } from 'lib/tag/random';
 
+import Event from 'power-event';
+
 type ReactEvent = React.PointerEvent<HTMLCanvasElement>;
 
 const getPointerPos = ({ clientX, clientY }: ReactEvent): Point => [
@@ -17,26 +19,25 @@ export class CanvasCutComponent extends React.PureComponent {
 	private prePos: Point = [0, 0];
 	private cc: CanvasCut | null = null;
 
+	private ec = Event.space('menu');
+
 	public componentDidMount = () => {
 		this.setSize();
 
 		const canvas = this.ref.current as HTMLCanvasElement;
 		const canvasCut = attachCanvas(canvas);
-		randomMove(canvasCut.createElement(Triangle.create(Triangle.Type.t1)));
-		randomMove(canvasCut.createElement(Triangle.create(Triangle.Type.t2)));
-		randomMove(canvasCut.createElement(Triangle.create(Triangle.Type.t3)));
-		randomMove(canvasCut.createElement(Irregular.create(Irregular.Type.t1)));
-		randomMove(canvasCut.createElement(Irregular.create(Irregular.Type.t2)));
-		randomMove(canvasCut.createElement(Irregular.create(Irregular.Type.t3)));
-		randomMove(
-			canvasCut.createElement(Parallelogram.create(Parallelogram.Type.t1))
-		);
-		randomMove(
-			canvasCut.createElement(Parallelogram.create(Parallelogram.Type.t2))
-		);
-		randomMove(
-			canvasCut.createElement(Parallelogram.create(Parallelogram.Type.t3))
-		);
+		[Irregular, Triangle, Parallelogram].forEach(v => {
+			v.typeArr.forEach(t => {
+				randomMove(
+					canvasCut.createElement(t.map(p => p.map(s => s * 50) as Point))
+				);
+			});
+		});
+		this.ec.on('create-graph', (path: Path) => {
+			randomMove(
+				canvasCut.createElement(path.map(p => p.map(x => x * 50) as Point))
+			);
+		});
 		this.cc = canvasCut;
 		window.addEventListener('resize', this.setSize);
 	};

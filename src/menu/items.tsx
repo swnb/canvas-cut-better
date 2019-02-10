@@ -1,5 +1,5 @@
 import * as React from 'react';
-// import Event from 'power-event';
+import Event from 'power-event';
 import { Triangle, Parallelogram, Irregular, path2clipPath } from 'lib/species';
 import * as Styles from './items.module.css';
 
@@ -7,16 +7,14 @@ type ClickHandler = (
 	event: React.MouseEvent<HTMLDivElement, MouseEvent>
 ) => void;
 
-const GraphSpecies = {
-	Triangle,
-	Irregular,
-	Parallelogram
-};
+const contactClassName = (...className: any[]) => className.join(' ');
 
-// const ec = Event.space('menu');
-// const dispatch = (methods: any) => () => {
-// 	ec.emit('create', methods);
-// };
+const GraphSpecies = [Triangle, Irregular, Parallelogram];
+
+const ec = Event.space('menu');
+const dispatch = (path: Path) => () => {
+	ec.emit('create-graph', path);
+};
 
 const Item = ({
 	clipPath,
@@ -29,38 +27,36 @@ const Item = ({
 export default React.memo(() => {
 	const [isShowType, setIsShowType] = React.useState(false);
 
-	const toggleShowType = () => {
+	const [typeArr, setTypeArr] = React.useState([] as Path[]);
+
+	const toggleShowType = (pathArr: Path[]) => () => {
+		setTypeArr(pathArr);
 		setIsShowType(!isShowType);
 	};
 
 	return (
 		<div
-			className={Styles.container}
-			style={
-				isShowType
-					? {
-							transform: 'rotateX(90deg)'
-					  }
-					: undefined
-			}
+			className={contactClassName(
+				Styles.container,
+				isShowType ? Styles.rotate : undefined
+			)}
 		>
 			<div className={Styles.wraper}>
-				{Object.values(GraphSpecies).map(({ create, Type: { tP } }, index) => (
+				{GraphSpecies.map(({ typeArr: arr, tP }, index) => (
 					// each item use clipath to show poster
 					<Item
 						key={index}
-						clipPath={path2clipPath(create(tP))}
-						onClick={toggleShowType}
+						clipPath={path2clipPath(tP)}
+						onClick={toggleShowType(arr)}
 					/>
 				))}
 			</div>
 			<div className={Styles.wraper}>
-				{Object.values(GraphSpecies).map(({ create, Type: { tP } }, index) => (
-					// each item use clipath to show poster
-					<Item
+				{typeArr.map((path, index) => (
+					<div
 						key={index}
-						clipPath={path2clipPath(create(tP))}
-						onClick={toggleShowType}
+						style={{ clipPath: path2clipPath(path) }}
+						onClick={dispatch(path)}
 					/>
 				))}
 			</div>

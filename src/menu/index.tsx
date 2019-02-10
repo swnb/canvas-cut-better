@@ -4,7 +4,7 @@ import Items from './items';
 
 const { useState } = React;
 
-function useShow(initState: boolean): [boolean, () => void] {
+function useToggleShow(initState: boolean): [boolean, () => void] {
 	const [isShow, setIsShow] = useState(initState);
 
 	return [
@@ -16,17 +16,19 @@ function useShow(initState: boolean): [boolean, () => void] {
 }
 
 export const Menu = () => {
-	const [isShow, toggleShow] = useShow(false);
+	const [isSiderDrawerShow, toggleShow] = useToggleShow(false);
 
 	return (
 		<div
 			className={Styles.welt}
 			style={{
-				right: isShow ? '0' : ''
+				right: isSiderDrawerShow ? '0' : ''
 			}}
 		>
 			<div className={Styles.button} onClick={toggleShow}>
-				<div className={isShow ? Styles.iconShow : Styles.iconHide} />
+				<div
+					className={isSiderDrawerShow ? Styles.iconShow : Styles.iconHide}
+				/>
 			</div>
 			<div className={Styles.menu}>{<Items />}</div>
 		</div>

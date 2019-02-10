@@ -13,6 +13,10 @@
   transition: all 0.5s linear;
 }
 
+.rotate {
+  transform: rotateX(90deg);
+}
+
 .wraper {
   display: flex;
   position: absolute;
@@ -24,13 +28,18 @@
 }
 
 .wraper:nth-child(1) {
-  transform: translateZ(100px) rotateX(-90deg);
+  transform: translateZ(100px);
   transform-origin: 50% 50% -100px;
   background-color: #dee3b6;
 }
 
 .wraper:nth-child(2) {
-  transform: translateZ(100px);
+  transform: translateZ(100px) rotateX(-90deg);
   transform-origin: 50% 50% -100px;
   background-color: beige;
+}
+.wraper:nth-child(2) > div {
+  width: 100px;
+  height: 100px;
+  background-color: #46fd93;
 }
