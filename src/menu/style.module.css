@@ -48,4 +48,5 @@
 	display: inline-block;
 	width: 450px;
 	background-color: whitesmoke;
+	overflow: hidden;
 }

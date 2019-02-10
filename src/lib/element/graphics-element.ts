@@ -13,7 +13,7 @@ export class GraphicsElement extends Element implements RenderElement {
 	private context: CanvasRenderingContext2D;
 	private path2d = new Path2D();
 
-	constructor(context: CanvasRenderingContext2D, initPaths: Paths) {
+	constructor(context: CanvasRenderingContext2D, initPaths: Path) {
 		super(initPaths);
 		this.context = context;
 	}
@@ -27,7 +27,7 @@ export class GraphicsElement extends Element implements RenderElement {
 		this.borderColor = color;
 	}
 
-	public isPointInside = (point: Pos) => this.context.isPointInPath(this.path2d, ...point)
+	public isPointInside = (point: Point) => this.context.isPointInPath(this.path2d, ...point)
 
 	public render = () => {
 		const { context, } = this;
@@ -60,4 +60,4 @@ export class GraphicsElement extends Element implements RenderElement {
 	}
 }
 
-export const createGraphicsElement = (context: CanvasRenderingContext2D, paths: Paths) => new GraphicsElement(context, paths);
+export const createGraphicsElement = (context: CanvasRenderingContext2D, paths: Path) => new GraphicsElement(context, paths);

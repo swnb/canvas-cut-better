@@ -8,7 +8,7 @@ export const getCosDeg = (aVector: Vector, bVector: Vector) => ab(aVector, bVect
 
 export const getSinDeg = (aVector: Vector, bVector: Vector) => aXb(aVector, bVector) / (absAB(aVector, bVector));
 
-export const countDeg = (originPos: Pos, prePos: Pos, currentPos: Pos): [number, number] => {
+export const countDeg = (originPos: Point, prePos: Point, currentPos: Point): [number, number] => {
 	const preVector: Vector = abVector(originPos, prePos);
 	const currentVector: Vector = abVector(originPos, currentPos);
 	return [getCosDeg(preVector, currentVector), getSinDeg(preVector, currentVector)];
@@ -17,7 +17,7 @@ export const countDeg = (originPos: Pos, prePos: Pos, currentPos: Pos): [number,
 // implement affine-transformation with javascript
 // (define newX (- (* x (cos deg)) (* y (sin deg))))
 // (define newY (+ (* x (sin deg)) (* y (cos deg))))
-export const affineTransformation = (cosDeg: number, sinDeg: number, [x, y]: Pos, [originX, originY]: Pos = [0, 0]): Vector => {
+export const affineTransformation = (cosDeg: number, sinDeg: number, [x, y]: Point, [originX, originY]: Point = [0, 0]): Vector => {
 	const [relX, relY] = [x - originX, y - originY];
 	const [nextX, nextY] = [relX * cosDeg - relY * sinDeg, relX * sinDeg + relY * cosDeg]
 	return [nextX + originX, nextY + originY];

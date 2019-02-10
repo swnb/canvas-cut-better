@@ -1,6 +1,6 @@
 declare module '*.css'
 
-declare type Pos = Readonly<[number, number]>;
+declare type Point = Readonly<[number, number]>;
 declare type Vector = Readonly<[number, number]>;
-declare type LineSegment = Readonly<[Pos, Pos]>;
-declare type Paths = Pos[];
+declare type LineSegment = Readonly<[Point, Point]>;
+declare type Path = Point[];

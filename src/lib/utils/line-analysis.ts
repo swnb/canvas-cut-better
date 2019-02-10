@@ -13,7 +13,7 @@ export const createSamples = ([a, b]: LineSegment, step: number) => {
 	return samples;
 }
 
-export const findPointInsideLineSegment = (points: Pos[], [startPoint, endPoint]: LineSegment): null | Pos => {
+export const findPointInsideLineSegment = (points: Point[], [startPoint, endPoint]: LineSegment): null | Point => {
 	const length = distanceAB(startPoint, endPoint);
 	for (const point of points) {
 		const segment1 = distanceAB(startPoint, point);
@@ -28,7 +28,7 @@ export const reduceVectorSize = ([x, y]: Vector, size: number): Vector => {
 	return [x * size / distance, y * size / distance];
 }
 
-export const countSepatateVector = (centerPoint: Pos, [startPoint, endPoint]: LineSegment): Vector => {
+export const countSepatateVector = (centerPoint: Point, [startPoint, endPoint]: LineSegment): Vector => {
 	const segmentLength1 = distanceAB(startPoint, centerPoint);
 	const segmentLength2 = distanceAB(centerPoint, endPoint);
 	const ratio = segmentLength1 / (segmentLength1 + segmentLength2)

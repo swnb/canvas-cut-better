@@ -6,23 +6,23 @@ export abstract class Element {
 	public get locked() { return this.isLocked; }
 	public key = Symbol();
 
-	protected centerPoint: Pos;
-	protected originPaths: Paths;
-	protected recordPathsQueue: Paths[] = [];
-	protected currentPaths: Paths;
+	protected centerPoint: Point;
+	protected originPaths: Path;
+	protected recordPathsQueue: Path[] = [];
+	protected currentPaths: Path;
 	protected totalCosSinDeg: [number, number] = [1, 0];
 
 	private isLocked = false;
 
-	constructor(paths: Pos[]) {
+	constructor(paths: Point[]) {
 		this.centerPoint = countCenterPos(paths)
 		this.originPaths = [...paths];
 		this.currentPaths = [...paths];
 	}
 
-	public getCenterPiont = () => [...this.centerPoint] as Pos;
+	public getCenterPiont = () => [...this.centerPoint] as Point;
 
-	public getPaths = () => [...this.currentPaths] as Paths;
+	public getPaths = () => [...this.currentPaths] as Path;
 
 	public getTotalCosSinDeg = () => [...this.totalCosSinDeg] as [number, number];
 
@@ -34,7 +34,7 @@ export abstract class Element {
 		if (this.isLocked) this.isLocked = false;
 	}
 
-	public move = (vector: Pos) => {
+	public move = (vector: Point) => {
 		if (this.isLocked) return;
 
 		const { centerPoint, currentPaths } = this;
@@ -60,7 +60,7 @@ export abstract class Element {
 		this.recordPathsQueue.push([...this.currentPaths]);
 	}
 
-	public abstract isPointInside(point: Pos): boolean;
+	public abstract isPointInside(point: Point): boolean;
 
 	public abstract render(): void;
 
