@@ -26,7 +26,7 @@ export class CanvasCut {
 		this.sepatater = sepatater;
 	}
 
-	public createElement = (paths: Paths) => {
+	public createElement = (paths: Path) => {
 		const ele = createGraphicsElement(this.context, paths);
 		this.render.registRender(ele);
 		return ele;
@@ -40,11 +40,11 @@ export class CanvasCut {
 		// TODO 写入开启的动画
 	}
 
-	public receivePointerDown = (point: Pos) => {
+	public receivePointerDown = (point: Point) => {
 		this.selectElement(point);
 	}
 
-	public receivePointerMove = (prePoint: Pos, curPoint: Pos) => {
+	public receivePointerMove = (prePoint: Point, curPoint: Point) => {
 		switch (this.currenOprateMode) {
 			case OprateMode.move:
 				this.moveElement(prePoint, curPoint);
@@ -81,7 +81,7 @@ export class CanvasCut {
 		this.render.clear();
 	}
 
-	private selectElement = (pos: Pos) => {
+	private selectElement = (pos: Point) => {
 		// point at rotater
 		if (this.rotater.isPointInside(pos)) {
 			this.currenOprateMode = OprateMode.rotate;
@@ -105,13 +105,13 @@ export class CanvasCut {
 		this.rotater.destory();
 	}
 
-	private moveElement = (prePos: Pos, currentPos: Pos) => {
+	private moveElement = (prePos: Point, currentPos: Point) => {
 		if (!this.currentSelectedElement) return
 
 		this.currentSelectedElement.move(abVector(prePos, currentPos));
 	}
 
-	private rotateElement = (prePos: Pos, currentPos: Pos) => {
+	private rotateElement = (prePos: Point, currentPos: Point) => {
 		if (!this.currentSelectedElement) return;
 
 		const { currentSelectedElement } = this;
@@ -138,7 +138,7 @@ export class CanvasCut {
 		window.console.timeEnd("search");
 	}
 
-	// private createChildElement = (paths: Paths) => {
+	// private createChildElement = (paths: Path) => {
 	// const e = this.createElement(paths);
 	// const sepatateVector = countSepatateVector(e.getCenterPiont(), intersections);
 	// this.sepatater.addElement(e, sepatateVector);

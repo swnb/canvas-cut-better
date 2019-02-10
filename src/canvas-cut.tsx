@@ -5,7 +5,7 @@ import { randomMove } from 'lib/tag/random';
 
 type ReactEvent = React.PointerEvent<HTMLCanvasElement>;
 
-const getPointerPos = ({ clientX, clientY }: ReactEvent): Pos => [
+const getPointerPos = ({ clientX, clientY }: ReactEvent): Point => [
 	clientX,
 	clientY
 ];
@@ -14,7 +14,7 @@ export class CanvasCutComponent extends React.PureComponent {
 	public ref = React.createRef<HTMLCanvasElement>();
 
 	private startOprate = false;
-	private prePos: Pos = [0, 0];
+	private prePos: Point = [0, 0];
 	private cc: CanvasCut | null = null;
 
 	public componentDidMount = () => {

@@ -6,7 +6,7 @@ export enum Type {
 	t3,
 }
 
-export const create = (type: Type, baseSize = base.size): Paths => {
+export const create = (type: Type, baseSize = base.size): Path => {
 	switch (type) {
 		case Type.t1: {
 			return [

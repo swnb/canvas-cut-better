@@ -14,8 +14,8 @@ export class Wire implements RenderElement {
 
 	private context: CanvasRenderingContext2D;
 	private path2d = new Path2D();
-	private fixedPoint: Pos = [0, 0];
-	private movingPoint: Pos = [0, 0];
+	private fixedPoint: Point = [0, 0];
+	private movingPoint: Point = [0, 0];
 	private isChange = false;
 	private preContextConfig: ContextConfig = create(null);
 	private wireContextConfig: ContextConfig;
@@ -45,13 +45,13 @@ export class Wire implements RenderElement {
 		restore();
 	}
 
-	public setFixedPoint = (point: Pos) => {
+	public setFixedPoint = (point: Point) => {
 		this.fixedPoint = point;
 		this.movingPoint = point;
 		this.changeState();
 	}
 
-	public move = (movingPoint: Pos) => {
+	public move = (movingPoint: Point) => {
 		this.movingPoint = movingPoint;
 		this.changeState();
 	}
