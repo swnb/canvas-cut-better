@@ -27,7 +27,7 @@ export class CanvasCutComponent extends React.PureComponent {
 		const canvas = this.ref.current as HTMLCanvasElement;
 		const canvasCut = attachCanvas(canvas);
 		[Irregular, Triangle, Parallelogram].forEach(v => {
-			v.typeArr.forEach(t => {
+			v.paths.forEach(t => {
 				randomMove(
 					canvasCut.createElement(t.map(p => p.map(s => s * 50) as Point))
 				);

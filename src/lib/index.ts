@@ -1,6 +1,6 @@
 import { Render } from './render';
-import { createGraphicsElement, Element, Sepatater, GraphicsElement } from './element';
-import { abVector, countDeg } from './utils';
+import { createGraphicsElement, Element, Sepatater, GraphicsElement, Color } from './element';
+import { abVector, countDeg, random } from './utils';
 import { Rotater } from './rotater';
 import { Wire } from './wire';
 import { Cutter } from './cutter';
@@ -29,6 +29,11 @@ export class CanvasCut {
 	public createElement = (paths: Path) => {
 		const ele = createGraphicsElement(this.context, paths);
 		this.render.registRender(ele);
+		const r = random(0, 255);
+		const g = random(0, 255);
+		const b = random(0, 255);
+		const a = random(0, 1);
+		ele.setColor(new Color(r, g, b, a));
 		return ele;
 	}
 
@@ -137,13 +142,6 @@ export class CanvasCut {
 		}
 		window.console.timeEnd("search");
 	}
-
-	// private createChildElement = (paths: Path) => {
-	// const e = this.createElement(paths);
-	// const sepatateVector = countSepatateVector(e.getCenterPiont(), intersections);
-	// this.sepatater.addElement(e, sepatateVector);
-	// e.setColor(new Color(248, 148, 6, 1));
-	// };
 }
 
 export const attachCanvas = (canvas: HTMLCanvasElement) => {
