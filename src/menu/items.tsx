@@ -2,6 +2,7 @@ import * as React from 'react';
 import Event from 'power-event';
 import { Triangle, Parallelogram, Irregular, path2clipPath } from 'lib/species';
 import * as Styles from './items.module.css';
+import { Direction } from './direct-button';
 
 type ClickHandler = (
 	event: React.MouseEvent<HTMLDivElement, MouseEvent>
@@ -11,11 +12,13 @@ const contactClassName = (...className: any[]) => className.join(' ');
 
 const GraphSpecies = [Triangle, Irregular, Parallelogram];
 
-const ec = Event.space('menu');
-const dispatch = (path: Path) => () => {
-	ec.emit('create-graph', path);
+const eC = Event.space('menu');
+const createPath = (path: Path) => () => {
+	eC.emit('create-graph', path);
 };
-
+const setDirection = (direction: Direction) => {
+	eC.emit('setDirection', direction);
+};
 const Item = ({
 	clipPath,
 	onClick
@@ -24,39 +27,58 @@ const Item = ({
 	onClick: ClickHandler;
 }) => <div className={Styles.item} style={{ clipPath }} onClick={onClick} />;
 
-export default React.memo(() => {
-	const [isShowType, setIsShowType] = React.useState(false);
+const useSpeciesElement = ([]: Path): [
+	boolean,
+	Path[],
+	(path: Path[]) => () => void
+] => {
+	const [isShow, setIsShow] = React.useState(false);
 
-	const [typeArr, setTypeArr] = React.useState([] as Path[]);
+	React.useEffect(() => {
+		return eC.on('onDirectionChanged', (direction: Direction) => {
+			if (direction === 'down') {
+				setIsShow(false);
+			}
+		});
+	}, [isShow]);
 
-	const toggleShowType = (pathArr: Path[]) => () => {
-		setTypeArr(pathArr);
-		setIsShowType(!isShowType);
+	const [currentSpeciesPaths, setTypeArr] = React.useState([] as Path[]);
+
+	const ShowSpeciesPaths = (speciesPaths: Path[]) => () => {
+		setTypeArr(speciesPaths);
+		setDirection('down');
+		setIsShow(true);
 	};
+
+	return [isShow, currentSpeciesPaths, ShowSpeciesPaths];
+};
+
+export default React.memo(() => {
+	const [isShow, currentSpeciesPaths, ShowSpeciesPaths] = useSpeciesElement([]);
 
 	return (
 		<div
 			className={contactClassName(
 				Styles.container,
-				isShowType ? Styles.rotate : undefined
+				isShow ? Styles.rotate : undefined
 			)}
 		>
 			<div className={Styles.wraper}>
-				{GraphSpecies.map(({ typeArr: arr, tP }, index) => (
+				{GraphSpecies.map(({ paths, tP }, index) => (
 					// each item use clipath to show poster
 					<Item
 						key={index}
 						clipPath={path2clipPath(tP)}
-						onClick={toggleShowType(arr)}
+						onClick={ShowSpeciesPaths(paths)}
 					/>
 				))}
 			</div>
 			<div className={Styles.wraper}>
-				{typeArr.map((path, index) => (
+				{currentSpeciesPaths.map((path, index) => (
 					<div
 						key={index}
 						style={{ clipPath: path2clipPath(path) }}
-						onClick={dispatch(path)}
+						onClick={createPath(path)}
 					/>
 				))}
 			</div>

@@ -34,14 +34,19 @@
   height: 40px;
   background: whitesmoke;
   transition: all 0.5s ease-in-out;
-}
-
-.button .iconShow {
   clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
 }
 
-.button .iconHide {
-  clip-path: polygon(0% 50%, 100% 0%, 100% 100%);
+.button .iconRight {
+  transform: rotate(0deg);
+}
+
+.button .iconLeft {
+  transform: rotate(-180deg);
+}
+
+.button .iconDown {
+  transform: rotate(90deg);
 }
 
 .menu {
