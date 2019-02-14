@@ -4,7 +4,7 @@ import { Element } from 'lib/element';
 
 export class Cutter {
 	private cutLine: LineSegment | null = null;
-	private cutLineSamples: Pos[] = [];
+	private cutLineSamples: Point[] = [];
 
 	public cutElement = (element: Element) => {
 		if (!this.cutLine) return null;
@@ -26,9 +26,9 @@ export class Cutter {
 		this.cutLine = null;
 	}
 
-	private getIntersections = ({ isPointInside }: Element): null | Pos[] => {
+	private getIntersections = ({ isPointInside }: Element): null | Point[] => {
 		const { cutLineSamples: samples } = this;
-		const intersectons: Pos[] = [];
+		const intersectons: Point[] = [];
 		let prePosInside = false;
 		for (let i = 1; i < samples.length; i++) {
 			const pos = samples[i];
@@ -45,11 +45,11 @@ export class Cutter {
 		return intersectons;
 	}
 
-	private cut = (paths: Paths, intersections: Pos[]): Paths[] | null => {
+	private cut = (paths: Path, intersections: Point[]): Path[] | null => {
 		// searchFlag false means first intersection found;
 		// true means second intersection found;
-		const originPaths: Paths = [];
-		const newPaths: Paths[] = [originPaths];
+		const originPaths: Path = [];
+		const newPaths: Path[] = [originPaths];
 
 		let findFirstInsection = false;
 		let newPath = [];

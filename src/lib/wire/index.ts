@@ -1,5 +1,4 @@
 import { RenderElement } from 'lib/render';
-import { abPlus, distanceAB } from 'lib/utils';
 
 const { assign, create } = Object;
 
@@ -15,13 +14,11 @@ export class Wire implements RenderElement {
 
 	private context: CanvasRenderingContext2D;
 	private path2d = new Path2D();
-	private fixedPoint: Pos = [0, 0];
-	private movingPoint: Pos = [0, 0];
+	private fixedPoint: Point = [0, 0];
+	private movingPoint: Point = [0, 0];
 	private isChange = false;
 	private preContextConfig: ContextConfig = create(null);
 	private wireContextConfig: ContextConfig;
-
-	private minWireWidth: number = 30;
 
 	constructor(context: CanvasRenderingContext2D) {
 		this.context = context;
@@ -48,13 +45,13 @@ export class Wire implements RenderElement {
 		restore();
 	}
 
-	public setFixedPoint = (point: Pos) => {
+	public setFixedPoint = (point: Point) => {
 		this.fixedPoint = point;
 		this.movingPoint = point;
 		this.changeState();
 	}
 
-	public move = (movingPoint: Pos) => {
+	public move = (movingPoint: Point) => {
 		this.movingPoint = movingPoint;
 		this.changeState();
 	}
@@ -62,8 +59,8 @@ export class Wire implements RenderElement {
 	public getLineSegment = (): LineSegment => [this.fixedPoint, this.movingPoint];
 
 	public destory = () => {
-		this.fixedPoint = [0, 0];
-		this.movingPoint = [0, 0];
+		this.fixedPoint = [-100, -100];
+		this.movingPoint = [-100, -100];
 		this.changeState();
 	}
 
@@ -83,14 +80,13 @@ export class Wire implements RenderElement {
 
 	private drawNewPaths = () => {
 		const path2d = new Path2D();
-		if (this.minWireWidth < distanceAB(this.fixedPoint, this.movingPoint)) {
-			const capturePath2d = new Path2D();
-			const [cX, cY] = abPlus(this.fixedPoint, this.movingPoint).map(p => p / 2);
-			capturePath2d.arc(cX, cY, 10, 0, 2 * Math.PI);
-			path2d.addPath(capturePath2d);
-		}
-		path2d.moveTo(...this.fixedPoint);
-		path2d.lineTo(...this.movingPoint);
+		const [sX, sY] = this.fixedPoint;
+		const [eX, eY] = this.movingPoint;
+		path2d.arc(sX, sY, 10, 0, 2 * Math.PI)
+		path2d.moveTo(eX, eY);
+		path2d.arc(eX, eY, 10, 0, 2 * Math.PI)
+		path2d.moveTo(sX, sY);
+		path2d.lineTo(eX, eY);
 		this.path2d = path2d;
 	}
 }

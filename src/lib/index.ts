@@ -1,6 +1,6 @@
 import { Render } from './render';
-import { createGraphicsElement, Element, Sepatater, GraphicsElement } from './element';
-import { abVector, countDeg } from './utils';
+import { createGraphicsElement, Element, Sepatater, GraphicsElement, Color } from './element';
+import { abVector, countDeg, random } from './utils';
 import { Rotater } from './rotater';
 import { Wire } from './wire';
 import { Cutter } from './cutter';
@@ -26,9 +26,14 @@ export class CanvasCut {
 		this.sepatater = sepatater;
 	}
 
-	public createElement = (paths: Paths) => {
+	public createElement = (paths: Path) => {
 		const ele = createGraphicsElement(this.context, paths);
 		this.render.registRender(ele);
+		const r = random(0, 255);
+		const g = random(0, 255);
+		const b = random(0, 255);
+		const a = random(0, 1);
+		ele.setColor(new Color(r, g, b, a));
 		return ele;
 	}
 
@@ -40,11 +45,11 @@ export class CanvasCut {
 		// TODO 写入开启的动画
 	}
 
-	public receivePointerDown = (point: Pos) => {
+	public receivePointerDown = (point: Point) => {
 		this.selectElement(point);
 	}
 
-	public receivePointerMove = (prePoint: Pos, curPoint: Pos) => {
+	public receivePointerMove = (prePoint: Point, curPoint: Point) => {
 		switch (this.currenOprateMode) {
 			case OprateMode.move:
 				this.moveElement(prePoint, curPoint);
@@ -81,7 +86,7 @@ export class CanvasCut {
 		this.render.clear();
 	}
 
-	private selectElement = (pos: Pos) => {
+	private selectElement = (pos: Point) => {
 		// point at rotater
 		if (this.rotater.isPointInside(pos)) {
 			this.currenOprateMode = OprateMode.rotate;
@@ -105,13 +110,13 @@ export class CanvasCut {
 		this.rotater.destory();
 	}
 
-	private moveElement = (prePos: Pos, currentPos: Pos) => {
+	private moveElement = (prePos: Point, currentPos: Point) => {
 		if (!this.currentSelectedElement) return
 
 		this.currentSelectedElement.move(abVector(prePos, currentPos));
 	}
 
-	private rotateElement = (prePos: Pos, currentPos: Pos) => {
+	private rotateElement = (prePos: Point, currentPos: Point) => {
 		if (!this.currentSelectedElement) return;
 
 		const { currentSelectedElement } = this;
@@ -137,13 +142,6 @@ export class CanvasCut {
 		}
 		window.console.timeEnd("search");
 	}
-
-	// private createChildElement = (paths: Paths) => {
-	// const e = this.createElement(paths);
-	// const sepatateVector = countSepatateVector(e.getCenterPiont(), intersections);
-	// this.sepatater.addElement(e, sepatateVector);
-	// e.setColor(new Color(248, 148, 6, 1));
-	// };
 }
 
 export const attachCanvas = (canvas: HTMLCanvasElement) => {

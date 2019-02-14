@@ -1,18 +1,13 @@
 import * as React from 'react';
 import { attachCanvas, CanvasCut } from 'lib';
-import {
-	Irregular,
-	IrregularType,
-	Triangle,
-	TriangleType,
-	Parallelogram,
-	ParallelogramType
-} from 'lib/species';
+import { Irregular, Triangle, Parallelogram } from 'lib/species';
 import { randomMove } from 'lib/tag/random';
+
+import Event from 'power-event';
 
 type ReactEvent = React.PointerEvent<HTMLCanvasElement>;
 
-const getPointerPos = ({ clientX, clientY }: ReactEvent): Pos => [
+const getPointerPos = ({ clientX, clientY }: ReactEvent): Point => [
 	clientX,
 	clientY
 ];
@@ -21,29 +16,28 @@ export class CanvasCutComponent extends React.PureComponent {
 	public ref = React.createRef<HTMLCanvasElement>();
 
 	private startOprate = false;
-	private prePos: Pos = [0, 0];
+	private prePos: Point = [0, 0];
 	private cc: CanvasCut | null = null;
+
+	private ec = Event.space('menu');
 
 	public componentDidMount = () => {
 		this.setSize();
 
 		const canvas = this.ref.current as HTMLCanvasElement;
 		const canvasCut = attachCanvas(canvas);
-		randomMove(canvasCut.createElement(Triangle(TriangleType.Triangle1)));
-		randomMove(canvasCut.createElement(Triangle(TriangleType.Triangle2)));
-		randomMove(canvasCut.createElement(Triangle(TriangleType.Triangle3)));
-		randomMove(canvasCut.createElement(Irregular(IrregularType.Irregular1)));
-		randomMove(canvasCut.createElement(Irregular(IrregularType.Irregular2)));
-		randomMove(canvasCut.createElement(Irregular(IrregularType.Irregular3)));
-		randomMove(
-			canvasCut.createElement(Parallelogram(ParallelogramType.Parallelogram1))
-		);
-		randomMove(
-			canvasCut.createElement(Parallelogram(ParallelogramType.Parallelogram2))
-		);
-		randomMove(
-			canvasCut.createElement(Parallelogram(ParallelogramType.Parallelogram3))
-		);
+		[Irregular, Triangle, Parallelogram].forEach(v => {
+			v.paths.forEach(t => {
+				randomMove(
+					canvasCut.createElement(t.map(p => p.map(s => s * 50) as Point))
+				);
+			});
+		});
+		this.ec.on('create-graph', (path: Path) => {
+			randomMove(
+				canvasCut.createElement(path.map(p => p.map(x => x * 50) as Point))
+			);
+		});
 		this.cc = canvasCut;
 		window.addEventListener('resize', this.setSize);
 	};

@@ -1,27 +1,29 @@
-const sqrt3 = Math.sqrt(3);
-
 export const tP: Path = [
 	[0.5, 0],
-	[1, 1],
+	[1, 0],
+	[0.5, 1],
 	[0, 1]
 ];
 
 const t1: Path = [
+	[0, 1],
 	[0.5, 0],
-	[1, 1],
-	[0, 1]
+	[1, 0],
+	[0.5, 1]
 ];
 
 const t2: Path = [
+	[0, 0],
 	[1, 0],
 	[1, 1],
 	[0, 1]
 ];
 
 const t3: Path = [
-	[1, 0],
-	[1, sqrt3],
-	[0, sqrt3]
+	[0, 0],
+	[2 / 3, 0],
+	[2 / 3, 1.5],
+	[0, 1.5]
 ];
 
 export const paths: Path[] = [t1, t2, t3];

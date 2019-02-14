@@ -1,6 +1,6 @@
 import { createSamples } from 'lib/utils';
 
-export const preciseGetIntersections = (isPointInside: (p: Pos) => boolean, lineSegment: LineSegment): Pos | null => {
+export const preciseGetIntersections = (isPointInside: (p: Point) => boolean, lineSegment: LineSegment): Point | null => {
 	const samples = createSamples(lineSegment, 1);
 	const prePosInside = isPointInside(samples[0]);
 	for (let i = 1; i < samples.length; i++) {

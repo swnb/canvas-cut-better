@@ -1,21 +1,33 @@
 import * as React from 'react';
-import * as Styles from './style.module.css';
+import * as Styles from './index.module.css';
+import Items from './items';
+import DirectIcon, { Direction } from './direct-button';
+import Event from 'power-event';
 
-const { useState } = React;
-
-function useShow(initState: boolean): [boolean, () => void] {
-	const [isShow, setIsShow] = useState(initState);
-
-	return [
-		isShow,
-		() => {
-			setIsShow(!isShow);
-		}
-	];
+const eC = Event.space('menu');
+function useShow(initState: boolean) {
+	const [isShow, setIsShow] = React.useState(initState);
+	React.useEffect(() => {
+		// Diawer will hidden when direction is change;
+		return eC.on('onDirectionChanged', (direction: Direction) => {
+			switch (direction) {
+				case 'right': {
+					setIsShow(false);
+					break;
+				}
+				case 'down':
+				case 'left': {
+					setIsShow(true);
+					break;
+				}
+			}
+		});
+	}, [isShow]);
+	return isShow;
 }
 
 export const Menu = () => {
-	const [isShow, toggleShow] = useShow(false);
+	const isShow = useShow(false);
 
 	return (
 		<div
@@ -24,10 +36,8 @@ export const Menu = () => {
 				right: isShow ? '0' : ''
 			}}
 		>
-			<div className={Styles.button} onClick={toggleShow}>
-				<div className={isShow ? Styles.iconShow : Styles.iconHide} />
-			</div>
-			<div className={Styles.menu} />
+			<DirectIcon />
+			<div className={Styles.menu}>{<Items />}</div>
 		</div>
 	);
 };

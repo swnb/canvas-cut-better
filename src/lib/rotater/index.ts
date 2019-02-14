@@ -7,10 +7,10 @@ interface Options {
 }
 
 interface Snapshot {
-	relPos: Pos;
-	preCenterPos: Pos;
+	relPos: Point;
+	preCenterPos: Point;
 	getTotalCosSinDeg(): [number, number];
-	getCenterPiont(): Pos;
+	getCenterPiont(): Point;
 }
 
 export class Rotater implements RenderElement {
@@ -59,7 +59,7 @@ export class Rotater implements RenderElement {
 		this.bindedElement = element;
 	}
 
-	public isPointInside = (point: Pos) => this.context.isPointInPath(this.path2d, ...point);
+	public isPointInside = (point: Point) => this.context.isPointInPath(this.path2d, ...point);
 
 	private drawPath2d = () => {
 		const snapshot = this.cacheElementSnapshot.get((this.bindedElement as Element).key) as Snapshot;
@@ -71,7 +71,7 @@ export class Rotater implements RenderElement {
 		this.createNewPath2d(point);
 	}
 
-	private getRelPos = (element: Element): Pos => {
+	private getRelPos = (element: Element): Point => {
 		const originPos = element.getCenterPiont();
 		let minY = Number.MAX_SAFE_INTEGER;
 		for (const [, y] of element.getPaths()) {
@@ -80,7 +80,7 @@ export class Rotater implements RenderElement {
 		return [originPos[0], minY - 30];
 	}
 
-	private createNewPath2d = ([x, y]: Pos) => {
+	private createNewPath2d = ([x, y]: Point) => {
 		const path2d = new Path2D();
 		path2d.arc(x, y, 10, 0, 2 * Math.PI)
 		this.path2d = path2d;

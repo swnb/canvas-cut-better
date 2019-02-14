@@ -1,41 +1,42 @@
-import { base } from "./base-var";
-
 export enum Type {
-	Irregular1 = 1,
-	Irregular2,
-	Irregular3,
+	t1 = 1,
+	t2,
+	t3,
+	tP
 }
 
-export const Irregular = (type: Type): Paths => {
-	const { size: baseSize } = base;
-	switch (type) {
-		case Type.Irregular1: {
-			return [
-				[0, 0],
-				[baseSize, 0],
-				[baseSize, baseSize],
-				[baseSize / 2, baseSize * 3 / 2],
-				[0, baseSize]
-			];
-		}
-		case Type.Irregular2: {
-			return [
-				[0, 0],
-				[baseSize * 2, 0],
-				[baseSize * 3 / 2, baseSize],
-				[baseSize, baseSize * 3 / 2],
-				[baseSize / 2, baseSize]
-			];
-		}
-		case Type.Irregular3: {
-			return [
-				[0, baseSize],
-				[0, 0],
-				[baseSize / 2, baseSize / 2],
-				[baseSize, 0],
-				[baseSize, baseSize],
-				[baseSize / 2, baseSize * 3 / 2]
-			];
-		}
-	}
-}
+export const tP: Path = [
+	[0, 0],
+	[0.5, 0.5],
+	[1, 0],
+	[1, 1],
+	[0, 1]
+]
+
+const t1: Path = [
+	[0, 0],
+	[0.5, 0.5],
+	[1, 0],
+	[1, 0.5],
+	[0.5, 1],
+	[0, 0.5]
+];
+
+const t2: Path = [
+	[0, 1],
+	[0, 0.5],
+	[0.5, 0],
+	[1, 0.5],
+	[1, 1]
+];
+
+const t3: Path = [
+	[0, 1],
+	[0, 0],
+	[0.5, 0.5],
+	[1, 0],
+	[1, 1],
+	[0.5, 1.5]
+];
+
+export const paths: Path[] = [t1, t2, t3];

@@ -1,0 +1,57 @@
+/* welt */
+.welt {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: -450px;
+  margin: auto;
+  width: 500px;
+  height: 200px;
+  transition: right 0.5s ease-in-out;
+}
+
+.welt > div {
+  height: 100%;
+}
+
+/* button */
+.button {
+  display: inline-block;
+  position: relative;
+  width: 50px;
+  background-color: #53d5ff;
+  border-radius: 100% 0 0 100%/30% 0 0 30%;
+}
+
+.button > div {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  width: 20px;
+  height: 40px;
+  background: whitesmoke;
+  transition: all 0.5s ease-in-out;
+  clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+}
+
+.button .iconRight {
+  transform: rotate(0deg);
+}
+
+.button .iconLeft {
+  transform: rotate(-180deg);
+}
+
+.button .iconDown {
+  transform: rotate(90deg);
+}
+
+.menu {
+  display: inline-block;
+  width: 450px;
+  background-color: whitesmoke;
+  overflow: hidden;
+}
