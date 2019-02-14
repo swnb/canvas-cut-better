@@ -39,4 +39,4 @@ const t3: Path = [
 	[0.5, 1.5]
 ];
 
-export const typeArr: Path[] = [t1, t2, t3];
+export const paths: Path[] = [t1, t2, t3];
