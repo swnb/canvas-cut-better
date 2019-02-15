@@ -1,7 +1,5 @@
 import * as React from 'react';
-import { attachCanvas, CanvasCut } from 'lib';
-import { Irregular, Triangle, Parallelogram } from 'lib/species';
-import { randomMove } from 'lib/tag/random';
+import { attachCanvas, EnhanceCore } from 'lib';
 
 import Event from 'power-event';
 
@@ -17,29 +15,22 @@ export class CanvasCutComponent extends React.PureComponent {
 
 	private startOprate = false;
 	private prePos: Point = [0, 0];
-	private cc: CanvasCut | null = null;
+	private CCC: EnhanceCore | undefined;
 
-	private ec = Event.space('menu');
+	private eC = Event.space('menu');
+	private unSubscribe: () => any | undefined;
 
 	public componentDidMount = () => {
-		this.setSize();
+		const { setSize, eC } = this;
+		setSize();
 
 		const canvas = this.ref.current as HTMLCanvasElement;
-		const canvasCut = attachCanvas(canvas);
-		[Irregular, Triangle, Parallelogram].forEach(v => {
-			v.paths.forEach(t => {
-				randomMove(
-					canvasCut.createElement(t.map(p => p.map(s => s * 50) as Point))
-				);
-			});
+		const canvasCutCore = attachCanvas(canvas);
+		this.unSubscribe = eC.on('create-graph', (path: Path) => {
+			canvasCutCore.enhanceCreateElement(path);
 		});
-		this.ec.on('create-graph', (path: Path) => {
-			randomMove(
-				canvasCut.createElement(path.map(p => p.map(x => x * 50) as Point))
-			);
-		});
-		this.cc = canvasCut;
-		window.addEventListener('resize', this.setSize);
+		this.CCC = canvasCutCore;
+		window.addEventListener('resize', setSize);
 	};
 
 	public render = () => (
@@ -53,30 +44,29 @@ export class CanvasCutComponent extends React.PureComponent {
 	);
 
 	public componentWillUnmount = () => {
-		if (this.cc) {
-			this.cc.destory();
-			this.cc = null;
-		}
+		if (this.CCC) this.CCC.destory();
+
+		this.unSubscribe();
 		window.removeEventListener('resize', this.setSize);
 	};
 
 	private onPointerDown = (event: ReactEvent) => {
-		if (!this.cc) return;
+		if (!this.CCC) return;
 		this.startOprate = true;
 		this.prePos = getPointerPos(event);
-		this.cc.receivePointerDown(this.prePos);
+		this.CCC.receivePointerDown(this.prePos);
 	};
 
 	private onPointerMove = (event: ReactEvent) => {
-		if (!this.startOprate || !this.cc) return;
+		if (!this.startOprate || !this.CCC) return;
 		const nextPos = getPointerPos(event);
-		this.cc.receivePointerMove(this.prePos, nextPos);
+		this.CCC.receivePointerMove(this.prePos, nextPos);
 		this.prePos = nextPos;
 	};
 
 	private onPointerUp = (event: ReactEvent) => {
-		if (!this.startOprate || !this.cc) return;
-		this.cc.receivePointerUp();
+		if (!this.startOprate || !this.CCC) return;
+		this.CCC.receivePointerUp();
 		this.startOprate = false;
 	};
 

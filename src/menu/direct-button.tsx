@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as Styles from './index.module.css';
+import * as Styles from './css/index.module.css';
 import Event from 'power-event';
 
 const { iconRight, iconLeft, iconDown } = Styles;

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Event from 'power-event';
 import { Triangle, Parallelogram, Irregular, path2clipPath } from 'lib/species';
-import * as Styles from './items.module.css';
+import * as Styles from './css/items.module.css';
 import { Direction } from './direct-button';
 
 type ClickHandler = (
@@ -35,11 +35,12 @@ const useSpeciesElement = ([]: Path): [
 	const [isShow, setIsShow] = React.useState(false);
 
 	React.useEffect(() => {
-		return eC.on('onDirectionChanged', (direction: Direction) => {
+		const onDirectionChanged = (direction: Direction) => {
 			if (direction === 'down') {
 				setIsShow(false);
 			}
-		});
+		};
+		return eC.on('onDirectionChanged', onDirectionChanged);
 	}, [isShow]);
 
 	const [currentSpeciesPaths, setTypeArr] = React.useState([] as Path[]);
