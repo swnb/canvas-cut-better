@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as Styles from './index.module.css';
+import * as Styles from './css/index.module.css';
 import Items from './items';
 import DirectIcon, { Direction } from './direct-button';
 import Event from 'power-event';
@@ -8,8 +8,7 @@ const eC = Event.space('menu');
 function useShow(initState: boolean) {
 	const [isShow, setIsShow] = React.useState(initState);
 	React.useEffect(() => {
-		// Diawer will hidden when direction is change;
-		return eC.on('onDirectionChanged', (direction: Direction) => {
+		const onDirectionChanged = (direction: Direction) => {
 			switch (direction) {
 				case 'right': {
 					setIsShow(false);
@@ -21,7 +20,10 @@ function useShow(initState: boolean) {
 					break;
 				}
 			}
-		});
+		};
+
+		// Diawer will hidden when direction is change;
+		return eC.on('onDirectionChanged', onDirectionChanged);
 	}, [isShow]);
 	return isShow;
 }
