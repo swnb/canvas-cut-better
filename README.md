@@ -2,4 +2,14 @@
 
 canvas-cut better implement
 
-> this project is made by typescript
+> canvas-cut is game to cut graphics in web
+
+you can play it [here](https://swnb.github.io/canvas-cut-better/)
+
+1 . just click button right side and choose your graphics
+
+2 . click blank area and drag mouse to cut graphics
+
+3 . see what happen
+
+4 . enjoy it
