@@ -16,7 +16,7 @@ export class Render {
 	private beforeRenderCb: Array<() => void> = [];
 	private afterRenderCb: Array<() => void> = [];
 
-	public allElements = () => this.renderElements.values();
+	public allElements = () => [...this.renderElements.values()].reverse();
 
 	public registRender = (element: Element) => {
 		this.renderElements.set(element.key, element);
